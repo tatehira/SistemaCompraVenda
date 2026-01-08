@@ -32,6 +32,51 @@ const upload = multer({ storage: storage });
 
 // API Endpoints
 
+// --- Auth Endpoints ---
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    db.get("SELECT * FROM users WHERE username = ? AND password = ?", [username, password], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(401).json({ error: 'Credenciais inválidas' });
+        res.json({
+            message: 'Login successful',
+            user: { id: row.id, username: row.username, role: row.role }
+        });
+    });
+});
+
+// --- Points (Branches) Endpoints ---
+app.get('/api/points', (req, res) => {
+    db.all("SELECT * FROM points", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+app.post('/api/points', (req, res) => {
+    const { name, address } = req.body;
+    db.run("INSERT INTO points (name, address) VALUES (?, ?)", [name, address], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ id: this.lastID, name, address });
+    });
+});
+
+// --- Couriers Endpoints ---
+app.get('/api/couriers', (req, res) => {
+    db.all("SELECT * FROM couriers", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+app.post('/api/couriers', (req, res) => {
+    const { name, phone, default_fee } = req.body;
+    db.run("INSERT INTO couriers (name, phone, default_fee) VALUES (?, ?, ?)", [name, phone, default_fee], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ id: this.lastID, name, phone, default_fee });
+    });
+});
+
 // Get Gold Types
 app.get('/api/gold-types', (req, res) => {
     db.all(`SELECT * FROM gold_types`, [], (err, rows) => {
@@ -115,12 +160,12 @@ app.get('/api/transactions', (req, res) => {
 
 // Register Purchase (Buy Gold)
 app.post('/api/buy', upload.single('receipt'), (req, res) => {
-    const { weight_grams, price, date, gold_type_id, customer_name } = req.body;
+    const { weight_grams, price, date, gold_type_id, customer_name, point_id } = req.body;
     const receipt_path = req.file ? req.file.path : null;
     const final_customer = customer_name || 'Fornecedor';
 
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const params = ['BUY', weight_grams, price, final_customer, receipt_path, date || new Date().toISOString(), gold_type_id];
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const params = ['BUY', weight_grams, price, final_customer, receipt_path, date || new Date().toISOString(), gold_type_id, point_id || 1];
 
     db.run(sql, params, function (err) {
         if (err) {
@@ -131,15 +176,12 @@ app.post('/api/buy', upload.single('receipt'), (req, res) => {
     });
 });
 
-// Register Sale (Sell Gold)
+// Register Sale (Sell)
 app.post('/api/sell', upload.single('receipt'), (req, res) => {
-    const { weight_grams, price, customer_name, date, gold_type_id, delivery_courier, delivery_cost } = req.body;
+    const { weight_grams, price, customer_name, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id } = req.body;
     const receipt_path = req.file ? req.file.path : null;
 
-    // Simple stock check logic could be here, but sticking to "allow negative" for MVP or check logic
-    // For now, allow insert.
-
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, delivery_courier, delivery_cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
         'SELL',
         weight_grams,
@@ -149,7 +191,10 @@ app.post('/api/sell', upload.single('receipt'), (req, res) => {
         date || new Date().toISOString(),
         gold_type_id,
         delivery_courier || null,
-        delivery_cost || 0
+        delivery_cost || 0,
+        delivery_time || null,
+        point_id || 1,
+        courier_id || null
     ];
 
     db.run(sql, params, function (err) {
@@ -164,15 +209,11 @@ app.post('/api/sell', upload.single('receipt'), (req, res) => {
 // Update Transaction (Edit)
 app.put('/api/transactions/:id', (req, res) => {
     const { id } = req.params;
-    const { weight_grams, price, customer_name, delivery_courier, delivery_cost, gold_type_id, date } = req.body;
-
-    // We only update fields that are provided. using COALESCE or dynamic query is better, 
-    // but for simplicity we will assume full payload or build query dynamically.
-    // Let's assume full payload for simplicity from frontend Modal.
+    const { weight_grams, price, customer_name, delivery_courier, delivery_cost, delivery_time, gold_type_id, date, point_id } = req.body;
 
     const sql = `
         UPDATE transactions 
-        SET weight_grams = ?, price = ?, customer_name = ?, delivery_courier = ?, delivery_cost = ?, gold_type_id = ?, date = ?
+        SET weight_grams = ?, price = ?, customer_name = ?, delivery_courier = ?, delivery_cost = ?, delivery_time = ?, gold_type_id = ?, date = ?, point_id = ?
         WHERE id = ?
     `;
 
@@ -182,8 +223,10 @@ app.put('/api/transactions/:id', (req, res) => {
         customer_name,
         delivery_courier || null,
         delivery_cost || 0,
+        delivery_time || null,
         gold_type_id,
         date,
+        point_id,
         id
     ];
 
@@ -195,6 +238,69 @@ app.put('/api/transactions/:id', (req, res) => {
         res.json({ message: 'Transaction updated', changes: this.changes });
     });
 });
+
+// Stock Correction (Add/Remove Stock manually)
+app.post('/api/stock-correction', (req, res) => {
+    const { gold_type_id, weight_grams, reason } = req.body;
+    // We can simulate this as a 'BUY' (add) or 'SELL' (remove) with special flag or just 0 price?
+    // User wants "adjust". Let's create a transaction type 'ADJUST' or just use BUY/SELL with 0 price and note.
+    // Better: type='ADJUST'.
+    // NOTE: 'type' column check in previous code was just 'BUY'/'SELL' strings, so 'ADJUST' is fine if I didn't enforce CHECK constraint. Creating table query didn't force CHECK.
+
+    const type = weight_grams >= 0 ? 'BUY' : 'SELL'; // Or 'ADJUST'? 
+    // If I use 'ADJUST', I need to update Inventory logic.
+    // Let's use 'BUY'/'SELL' but with 0 price and customer_name as "AJUSTE DE ESTOQUE".
+
+    const finalWeight = Math.abs(weight_grams);
+    const finalType = weight_grams >= 0 ? 'BUY' : 'SELL';
+
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, date, gold_type_id) VALUES (?, ?, ?, ?, ?, ?)`;
+    const params = [finalType, finalWeight, 0, `AJUSTE: ${reason}`, new Date().toISOString(), gold_type_id];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ message: 'Stock adjusted' });
+    });
+});
+
+// Analytics Endpoint
+app.get('/api/analytics', (req, res) => {
+    // Group by Date (YYYY-MM-DD)
+    const sql = `
+        SELECT 
+            date(date) as day, 
+            type, 
+            SUM(price) as total_price, 
+            SUM(weight_grams) as total_weight 
+        FROM transactions 
+        GROUP BY day, type 
+        ORDER BY day ASC
+    `;
+
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+
+        // Process for Chart.js
+        const labels = [...new Set(rows.map(r => r.day))];
+        const boughtData = labels.map(day => {
+            const row = rows.find(r => r.day === day && r.type === 'BUY');
+            return row ? row.total_weight : 0;
+        });
+        const soldData = labels.map(day => {
+            const row = rows.find(r => r.day === day && r.type === 'SELL');
+            return row ? row.total_weight : 0;
+        });
+
+        res.json({ labels, boughtData, soldData });
+    });
+});
+
 
 
 

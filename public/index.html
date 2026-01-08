@@ -4,166 +4,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoldManager - Gestão de Ouro</title>
+    <title>Gestão de Estoque</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" type="image/png"
         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=">
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1>GoldManager</h1>
-            <p class="subtitle">Sistema de Gestão e Controle de Estoque de Ouro</p>
-        </header>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Gestão</h2>
+                <p>Mercadorias</p>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" onclick="switchTab('dashboard')">
+                    📊 Painel Geral
+                </button>
+                <button class="nav-btn" onclick="switchTab('entries')">
+                    📥 Entradas
+                </button>
+                <button class="nav-btn" onclick="switchTab('exits')">
+                    📤 Saídas
+                </button>
+                <button class="nav-btn" onclick="switchTab('history')">
+                    📜 Histórico
+                </button>
+                <button class="nav-btn" onclick="switchTab('actions')">
+                    ⚙️ Ações
+                </button>
+                <button class="nav-btn" onclick="switchTab('reports')">
+                    📄 Relatórios
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <p>© 2026</p>
+            </div>
+        </aside>
 
-        <!-- Action Menu -->
-        <div style="margin-bottom: 2rem; text-align: right;">
-            <button id="btn-add-type" class="btn btn-primary" style="width: auto;">+ Novo Tipo de Ouro</button>
-        </div>
+        <!-- Main Content Area -->
+        <main class="main-content">
 
-        <!-- Status Cards -->
-        <div class="stats-grid" id="stats-container">
-            <!-- Dynamically filled -->
-        </div>
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="view-section active">
+                <header>
+                    <h1>Visão Geral</h1>
+                    <p class="subtitle">Resumo de estoque e movimentações</p>
+                </header>
 
-        <!-- Action Forms -->
-        <div class="forms-grid">
-            <!-- Purchase Form -->
-            <div class="card">
-                <div class="section-title">Registrar Entrada (Compra)</div>
-                <form id="buy-form">
-                    <div class="form-group">
-                        <label>Tipo de Ouro</label>
-                        <select name="gold_type" required class="gold-type-select">
-                            <!-- Filled by JS -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Peso</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="number" step="0.01" name="weight" placeholder="Quantidade" required
-                                style="flex: 2;">
-                            <select name="unit"
-                                style="flex: 1; padding: 0.75rem; border-radius: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); color: var(--text-primary);">
-                                <option value="g">Gramas (g)</option>
-                                <option value="kg">Quilos (kg)</option>
+                <div class="stats-grid" id="stats-container">
+                    <!-- Dynamically filled -->
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Análise de Movimentação (30 dias)</div>
+                    <canvas id="movementChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- VIEW: ENTRIES (COMPRAS) -->
+            <div id="view-entries" class="view-section">
+                <header>
+                    <h1>Entradas</h1>
+                    <p class="subtitle">Registrar compra de mercadoria</p>
+                </header>
+
+                <div class="card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="section-title">Formulário de Entrada</div>
+                    <form id="buy-form">
+                        <div class="form-group">
+                            <label>Categoria / Produto</label>
+                            <select name="gold_type" required class="gold-type-select">
+                                <!-- Filled by JS -->
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Preço Pago (R$)</label>
-                        <input type="number" step="0.01" name="price" placeholder="Ex: 15000.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Fornecedor (Opcional)</label>
-                        <input type="text" name="customer" placeholder="Nome do Fornecedor">
-                    </div>
-                    <div class="form-group">
-                        <label>Comprovante</label>
-                        <input type="file" name="receipt" accept="image/*">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Registrar Compra</button>
-                </form>
+                        <div class="form-group">
+                            <label>Quantidade</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="number" step="0.01" name="weight" placeholder="Ex: 10" required
+                                    style="flex: 2;">
+                                <select name="unit"
+                                    style="flex: 1; padding: 0.75rem; border-radius: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); color: var(--text-primary);">
+                                    <option value="g">Unid / Gramas</option>
+                                    <option value="kg">Kilos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Custo Total (R$)</label>
+                            <input type="number" step="0.01" name="price" placeholder="Ex: 500.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fornecedor (Opcional)</label>
+                            <input type="text" name="customer" placeholder="Nome do Fornecedor">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Entrada</button>
+                    </form>
+                </div>
             </div>
 
-            <!-- Sale Form -->
-            <div class="card">
-                <div class="section-title">Registrar Saída (Venda)</div>
-                <form id="sell-form">
-                    <div class="form-group">
-                        <label>Tipo de Ouro</label>
-                        <select name="gold_type" required class="gold-type-select">
-                            <!-- Filled by JS -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Cliente</label>
-                        <input type="text" name="customer" placeholder="Nome do Cliente" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Peso</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="number" step="0.01" name="weight" placeholder="Quantidade" required
-                                style="flex: 2;">
-                            <select name="unit"
-                                style="flex: 1; padding: 0.75rem; border-radius: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); color: var(--text-primary);">
-                                <option value="g">Gramas (g)</option>
-                                <option value="kg">Quilos (kg)</option>
+            <!-- VIEW: EXITS (VENDAS) -->
+            <div id="view-exits" class="view-section">
+                <header>
+                    <h1>Saídas</h1>
+                    <p class="subtitle">Registrar venda de mercadoria</p>
+                </header>
+
+                <div class="card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="section-title">Formulário de Saída</div>
+                    <form id="sell-form">
+                        <div class="form-group">
+                            <label>Categoria / Produto</label>
+                            <select name="gold_type" required class="gold-type-select">
+                                <!-- Filled by JS -->
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Preço de Venda (R$)</label>
-                        <input type="number" step="0.01" name="price" placeholder="Ex: 3500.00" required>
-                    </div>
-
-                    <!-- Delivery Toggle -->
-                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-                        <input type="checkbox" id="delivery-check" style="width: auto;">
-                        <label for="delivery-check" style="margin: 0; cursor: pointer;">É para entrega?</label>
-                    </div>
-
-                    <!-- Delivery Fields (Hidden) -->
-                    <div id="delivery-fields"
-                        style="display: none; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 1rem;">
                         <div class="form-group">
-                            <label>Entregador</label>
-                            <input type="text" name="delivery_courier" placeholder="Nome do Motoboy">
+                            <label>Cliente / Destino</label>
+                            <input type="text" name="customer" placeholder="Nome do Cliente" required>
                         </div>
                         <div class="form-group">
-                            <label>Valor da Corrida (R$)</label>
-                            <input type="number" step="0.01" name="delivery_cost" placeholder="0.00">
+                            <label>Quantidade</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="number" step="0.01" name="weight" placeholder="Ex: 2" required
+                                    style="flex: 2;">
+                                <select name="unit"
+                                    style="flex: 1; padding: 0.75rem; border-radius: 8px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); color: var(--text-primary);">
+                                    <option value="g">Unid / Gramas</option>
+                                    <option value="kg">Kilos</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <label>Valor Venda (R$)</label>
+                            <input type="number" step="0.01" name="price" placeholder="Ex: 100.00" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label>Data</label>
-                        <input type="date" name="date" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Comprovante</label>
-                        <input type="file" name="receipt" accept="image/*">
-                    </div>
-                    <button type="submit" class="btn btn-danger">Registrar Venda</button>
-                </form>
-            </div>
-        </div>
+                        <!-- Delivery Toggle -->
+                        <div class="form-group"
+                            style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                            <input type="checkbox" id="delivery-check" style="width: auto;">
+                            <label for="delivery-check" style="margin: 0; cursor: pointer;">Entrega?</label>
+                        </div>
 
-        <!-- Transactions History -->
-        <div class="transactions-section">
-            <div class="section-title">Histórico de Transações</div>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Tipo</th>
-                            <th>Ouro</th>
-                            <th>Cliente / Origem</th>
-                            <th>Peso (g)</th>
-                            <th>Valor (R$)</th>
-                            <th>Entrega</th>
-                            <th>Comprovante</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactions-body">
-                        <!-- Filled by JS -->
-                    </tbody>
-                </table>
+                        <!-- Delivery Fields (Hidden) -->
+                        <div id="delivery-fields"
+                            style="display: none; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label>Entregador</label>
+                                <input type="text" name="delivery_courier" placeholder="Nome do Motoboy">
+                            </div>
+                            <div class="form-group">
+                                <label>Hora</label>
+                                <input type="time" name="delivery_time">
+                            </div>
+                            <div class="form-group">
+                                <label>Valor (R$)</label>
+                                <input type="number" step="0.01" name="delivery_cost" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" name="date" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Registrar Saída</button>
+                    </form>
+                </div>
             </div>
-        </div>
+
+            <!-- VIEW: HISTORY -->
+            <div id="view-history" class="view-section">
+                <header>
+                    <h1>Histórico</h1>
+                    <p class="subtitle">Log completo de transações</p>
+                </header>
+                <div class="transactions-section">
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Produto</th>
+                                    <th>Cliente</th>
+                                    <th>Qtd</th>
+                                    <th>Valor</th>
+                                    <th>Entrega</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-body">
+                                <!-- Filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ACTIONS -->
+            <div id="view-actions" class="view-section">
+                <header>
+                    <h1>Ações</h1>
+                    <p class="subtitle">Gerenciamento de estoque e categorias</p>
+                </header>
+
+                <div class="card">
+                    <div class="section-title">Gerenciamento Rápido</div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button id="btn-add-type" class="btn btn-primary" style="flex: 1;">+ Nova Categoria</button>
+                        <button id="btn-adjust-stock" class="btn"
+                            style="flex: 1; background: var(--text-secondary);">Ajuste de Estoque</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: REPORTS -->
+            <div id="view-reports" class="view-section">
+                <header>
+                    <h1>Relatórios</h1>
+                    <p class="subtitle">Gerar PDF de movimentações</p>
+                </header>
+
+                <div class="card" style="max-width: 600px; margin: 0 auto;">
+                    <div class="section-title">Configurar Relatório</div>
+                    <form id="report-form" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Data Inicial</label>
+                            <input type="date" name="start_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Final</label>
+                            <input type="date" name="end_date" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">📄 Gerar Relatório</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <!-- Type Modal -->
     <div id="type-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-modal" id="close-type">&times;</span>
-            <h2>Novo Tipo de Ouro</h2>
+            <h2>Nova Categoria</h2>
             <form id="type-form" style="margin-top: 1.5rem;">
                 <div class="form-group">
-                    <label>Nome do Tipo</label>
-                    <input type="text" name="type_name" placeholder="Ex: Ouro 18k, Ouro 24k, Sucata" required>
+                    <label>Nome da Categoria</label>
+                    <input type="text" name="type_name" placeholder="Ex: Bebidas, Eletronicos..." required>
                 </div>
                 <button type="submit" class="btn btn-primary">Salvar</button>
             </form>
@@ -185,14 +277,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Tipo de Ouro</label>
+                    <label>Categoria</label>
                     <select name="gold_type_id" required class="gold-type-select">
                         <!-- Filled by JS -->
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Peso (g)</label>
+                    <label>Qtd</label>
                     <input type="number" step="0.01" name="weight_grams" required>
                 </div>
 
@@ -213,7 +305,11 @@
                         <input type="text" name="delivery_courier">
                     </div>
                     <div class="form-group">
-                        <label>Custo Entrega</label>
+                        <label>Hora</label>
+                        <input type="time" name="delivery_time">
+                    </div>
+                    <div class="form-group">
+                        <label>Custo</label>
                         <input type="number" step="0.01" name="delivery_cost">
                     </div>
                 </div>
@@ -222,6 +318,33 @@
             </form>
         </div>
     </div>
+
+    <!-- Adjust Stock Modal -->
+    <div id="adjust-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" id="close-adjust">&times;</span>
+            <h2>Ajuste de Estoque</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Use valores positivos para adicionar e
+                negativos para remover.</p>
+            <form id="adjust-form">
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select name="gold_type_id" required class="gold-type-select"></select>
+                </div>
+                <div class="form-group">
+                    <label>Qtd (+/-)</label>
+                    <input type="number" step="0.01" name="weight_grams" placeholder="Ex: -10 ou 10" required>
+                </div>
+                <div class="form-group">
+                    <label>Motivo</label>
+                    <input type="text" name="reason" placeholder="Ex: Perda, erro de contagem" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Aplicar</button>
+            </form>
+        </div>
+    </div>
+
+
 
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
