@@ -44,7 +44,7 @@ app.post('/api/login', (req, res) => {
         if (!row) return res.status(401).json({ error: 'Credenciais inválidas' });
         res.json({
             message: 'Login successful',
-            user: { id: row.id, username: row.username, role: row.role }
+            user: { id: row.id, username: row.username, role: row.role, preferred_unit: row.preferred_unit || 'g' }
         });
     });
 });
@@ -57,10 +57,28 @@ app.post('/api/register', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         if (row) return res.status(400).json({ error: 'Usuário já existe' });
 
-        db.run("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [username, password, 'admin'], function (err) {
+        db.run("INSERT INTO users (username, password, role, preferred_unit) VALUES (?, ?, ?, ?)", [username, password, 'admin', 'g'], function (err) {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: 'User created', id: this.lastID });
         });
+    });
+});
+
+app.put('/api/user/settings', (req, res) => {
+    const { user_id, preferred_unit } = req.body;
+    if (!user_id) return res.status(400).json({ error: 'User ID required' });
+
+    db.run("UPDATE users SET preferred_unit = ? WHERE id = ?", [preferred_unit, user_id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Configurações atualizadas' });
+    });
+});
+
+app.get('/api/user/:id', (req, res) => {
+    db.get("SELECT id, username, role, preferred_unit FROM users WHERE id = ?", [req.params.id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: 'User not found' });
+        res.json(row);
     });
 });
 
@@ -100,9 +118,17 @@ app.post('/api/couriers', (req, res) => {
     });
 });
 
-// Get Gold Types (Shared for now, but could be isolated if needed)
+// Get Gold Types (Filtered by User)
 app.get('/api/gold-types', (req, res) => {
-    db.all(`SELECT * FROM gold_types`, [], (err, rows) => {
+    const userId = req.query.user_id;
+    // For gold types, maybe allow viewing Global ones (user_id IS NULL) AND user specific ones?
+    // User wants "separate bases". So typically ONLY user specific.
+    // But we need to handle legacy data (NULL user_id).
+    // Strategy: Show user's types OR types with NULL user_id (defaults).
+
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+
+    db.all(`SELECT * FROM gold_types WHERE user_id = ? OR user_id IS NULL`, [userId], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -113,13 +139,22 @@ app.get('/api/gold-types', (req, res) => {
 
 // Add Gold Type
 app.post('/api/gold-types', (req, res) => {
-    const { name } = req.body;
-    db.run(`INSERT INTO gold_types (name) VALUES (?)`, [name], function (err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ id: this.lastID, name });
+    const { name, user_id } = req.body;
+
+    if (!user_id) return res.status(400).json({ error: 'User ID required' });
+
+    // Check duplicate for this user
+    db.get("SELECT * FROM gold_types WHERE name = ? AND (user_id = ? OR user_id IS NULL)", [name, user_id], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (row) return res.status(400).json({ error: 'Categoria já existe' });
+
+        db.run(`INSERT INTO gold_types (name, user_id) VALUES (?, ?)`, [name, user_id], function (err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json({ id: this.lastID, name });
+        });
     });
 });
 

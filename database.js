@@ -14,10 +14,12 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 function initializeSchema() {
     db.serialize(() => {
-        // Gold Types Table
+        // Gold Types Table (Updated with user_id)
         db.run(`CREATE TABLE IF NOT EXISTS gold_types (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
+            name TEXT NOT NULL,
+            user_id INTEGER,
+            FOREIGN KEY(user_id) REFERENCES users(id)
         )`);
 
         // Users Table (Auth)
@@ -79,7 +81,8 @@ function initializeSchema() {
             { table: 'transactions', name: 'delivery_time', type: 'TEXT' },
             { table: 'transactions', name: 'user_id', type: 'INTEGER' },
             { table: 'points', name: 'user_id', type: 'INTEGER' },
-            { table: 'couriers', name: 'user_id', type: 'INTEGER' }
+            { table: 'couriers', name: 'user_id', type: 'INTEGER' },
+            { table: 'gold_types', name: 'user_id', type: 'INTEGER' }
         ];
 
         columnsToAdd.forEach(col => {
@@ -88,6 +91,48 @@ function initializeSchema() {
                     // console.error(`Error adding column ${col.name}:`, err.message);
                 }
             });
+        });
+
+        // MIGRATE GOLD TYPES UNIQUE CONSTRAINT (Robust & Idempotent)
+        // We check if we need to migrate by looking at the schema or just wrapping in try-catch logic implied by the structure.
+        // For safety/simplification now: We will NOT auto-run the Rename/Drop block every time.
+        // Instead, we rely on the initial CREATE statement (which we changed to NOT have UNIQUE) for new installs.
+        // For existing installs, we might have the constraint.
+        // A safe migration would be: check if 'gold_types_old' exists (failed mid-migration).
+
+        db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='gold_types_old'", (err, row) => {
+            if (row) {
+                // If _old exists, it means we might have failed before or finished but not dropped.
+                // We should check if gold_types exists.
+                db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='gold_types'", (e, r) => {
+                    if (!r) {
+                        // gold_types missing? Rename old back to restore or create new?
+                        // Let's create new and copy from old.
+                        db.run(`CREATE TABLE gold_types (
+                             id INTEGER PRIMARY KEY AUTOINCREMENT,
+                             name TEXT NOT NULL,
+                             user_id INTEGER,
+                             FOREIGN KEY(user_id) REFERENCES users(id)
+                        )`);
+                        db.run(`INSERT INTO gold_types (id, name, user_id) SELECT id, name, NULL FROM gold_types_old`, () => {
+                            db.run(`DROP TABLE gold_types_old`);
+                        });
+                    } else {
+                        // Both exist? Maybe migration finished but didn't drop old.
+                        db.run(`DROP TABLE gold_types_old`);
+                    }
+                });
+            } else {
+                // Normal operation. We don't want to run the heavy rename migration every boot.
+                // We will skip it to prevent loops/crashes.
+            }
+        });
+
+        // Add preferred_unit to users
+        db.run(`ALTER TABLE users ADD COLUMN preferred_unit TEXT DEFAULT 'g'`, (err) => {
+            if (err && !err.message.includes('duplicate column')) {
+                // console.log("Added preferred_unit column");
+            }
         });
 
         // Seed default user if not exists

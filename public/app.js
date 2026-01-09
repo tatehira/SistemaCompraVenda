@@ -156,6 +156,8 @@ function loadApp() {
         updateStats().catch(e => console.error(e));
         updateTransactions().catch(e => console.error(e));
         loadChart().catch(e => console.error(e));
+        loadChart().catch(e => console.error(e));
+        applyUserPreferences();
         setupEventListeners();
     } catch (e) {
         console.error(e);
@@ -201,7 +203,7 @@ async function fetchCouriers() {
         const selects = document.querySelectorAll('.courier-select');
         selects.forEach(sel => {
             sel.innerHTML = '<option value="">Selecione...</option>' +
-                couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                couriers.map(c => `<option value="${c.id}" data-fee="${c.default_fee || 0}">${c.name}</option>`).join('');
         });
         const list = document.getElementById('couriers-list');
         if (list) {
@@ -221,16 +223,98 @@ async function fetchStockDetails() {
         const res = await fetch(`${API_URL}/stock-details?user_id=${userId}`);
         const data = await res.json();
         let html = '';
+        const pointsData = {};
+
+        // We need IDs to query history. The current endpoint only returns aggregated names.
+        // I need to update the endpoint or logic.
+        // Wait, the endpoint returns: { PointName: { GoldName: Qty } }. This is lossy.
+        // I should probably fetch ALL stock rows with IDs.
+        // For now, I will use PointName and GoldName to filter client-side or duplicate the fetch.
+        // Actually, let's keep it simple: Pass names to a filter function since we have a 'transactions' list available or fetch it.
+
         for (const [point, goldMap] of Object.entries(data)) {
-            html += `<div style="margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px;"><h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">📍 ${point}</h3><div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">`;
+            html += `<div style="margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px;">
+                        <h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">📍 ${point}</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">`;
+
             for (const [gold, quantity] of Object.entries(goldMap)) {
-                html += `<div style="background: rgba(15, 23, 42, 0.8); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-size: 0.9rem; color: var(--text-secondary);">${gold}</div><div style="font-size: 1.2rem; font-weight: bold;">${quantity.toFixed(2)} g</div></div>`;
+                html += `<div onclick="openStockHistory('${point}', '${gold}')" 
+                              style="background: rgba(15, 23, 42, 0.8); padding: 1rem; border-radius: 8px; text-align: center; cursor: pointer; transition: transform 0.2s;"
+                              onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);">${gold}</div>
+                            <div style="font-size: 1.2rem; font-weight: bold;">${quantity.toFixed(2)} g</div>
+                         </div>`;
             }
             html += `</div></div>`;
         }
         container.innerHTML = html || '<p>Sem estoque registrado.</p>';
     } catch (e) {
         container.innerHTML = '<p style="color:red">Erro ao carregar estoque.</p>';
+    }
+}
+
+// --- STOCK HISTORY (New) ---
+async function openStockHistory(pointName, goldName) {
+    const modal = document.getElementById('stock-item-modal');
+    const title = document.getElementById('stock-item-title');
+    const content = document.getElementById('stock-item-history');
+
+    modal.style.display = 'flex';
+    title.innerText = `${goldName} em ${pointName}`;
+    content.innerHTML = '<p>Carregando histórico...</p>';
+
+    try {
+        const userId = getUserId();
+        const res = await fetch(`${API_URL}/transactions?user_id=${userId}`);
+        const allTxs = await res.json(); // Not efficient for large data, but works for now.
+
+        // Filter by Point Name and Gold Name (Not IDs? server returns names joined)
+        // Check filtering logic.
+        // Transactions endpoint returns: point_id (int), gold_type_id (int).
+        // AND it joins gold_type_name. BUT it does NOT join point_name by default in the list endpoint?
+        // Let's check server.js... /api/transactions only joins gold_types. Point is ID.
+        // Problem: Point Name in stock-details comes from a join.
+        // I need to match Point Name. Or better, fix stock-details to return IDs too.
+
+        // Quick fix: Client side match is risky if names change.
+        // Let's matching by ID is better. But I don't have IDs in the loop above easily unless I change backend.
+        // Let's fetch Points to match ID.
+
+        const pointsRes = await fetch(`${API_URL}/points?user_id=${userId}`);
+        const points = await pointsRes.json();
+        const pointObj = points.find(p => p.name === pointName);
+
+        const filtered = allTxs.filter(tx => {
+            return (tx.gold_type_name === goldName) &&
+                (pointObj ? tx.point_id === pointObj.id : true);
+        });
+
+        if (filtered.length === 0) {
+            content.innerHTML = '<p>Nenhuma movimentação encontrada.</p>';
+            return;
+        }
+
+        content.innerHTML = `
+            <table style="width:100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem;">
+                <thead style="background: rgba(255,255,255,0.1);">
+                    <tr><th>Data</th><th>Tipo</th><th>Qtd</th><th>Valor</th><th>Cliente</th></tr>
+                </thead>
+                <tbody>
+                    ${filtered.map(tx => `
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${formatDate(tx.date)}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: ${tx.type === 'BUY' ? 'var(--success-color)' : 'var(--danger-color)'}">${tx.type === 'BUY' ? 'ENTRADA' : 'SAÍDA'}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${tx.weight_grams}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${formatCurrency(tx.price)}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${tx.customer_name || '-'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    } catch (e) {
+        console.error(e);
+        content.innerHTML = '<p style="color:red">Erro ao carregar detalhes.</p>';
     }
 }
 
@@ -251,10 +335,15 @@ function setupEventListeners() {
     const closeEditModal = document.getElementById('close-edit');
     if (closeEditModal) closeEditModal.onclick = () => editModal.style.display = 'none';
 
+    const stockItemModal = document.getElementById('stock-item-modal');
+    const closeStockItem = document.getElementById('close-stock-item');
+    if (closeStockItem) closeStockItem.onclick = () => stockItemModal.style.display = 'none';
+
     window.onclick = (event) => {
         if (event.target == modal) modal.style.display = 'none';
         if (event.target == editModal) editModal.style.display = 'none';
         if (event.target == adjustModal) adjustModal.style.display = 'none';
+        if (event.target == stockItemModal) stockItemModal.style.display = 'none';
     }
 
     const deliveryCheck = document.getElementById('delivery-check');
@@ -267,9 +356,61 @@ function setupEventListeners() {
     const dateInputs = document.querySelectorAll('input[name="date"]');
     dateInputs.forEach(input => input.valueAsDate = new Date());
 
+    // Settings Modal Logic
+    const settingsLink = document.getElementById('settings-link'); // Need to add this to HTML
+    const settingsModal = document.getElementById('settings-modal'); // Need to add this to HTML
+    const closeSettings = document.getElementById('close-settings');
+    const settingsForm = document.getElementById('settings-form');
+
+    if (settingsLink) {
+        settingsLink.onclick = (e) => {
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('settings-unit').value = user.preferred_unit || 'g';
+            }
+            settingsModal.style.display = 'flex';
+        };
+    }
+    if (closeSettings) closeSettings.onclick = () => settingsModal.style.display = 'none';
+
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const unit = document.getElementById('settings-unit').value;
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) return;
+
+            fetch(`${API_URL}/user/settings`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.id, preferred_unit: unit })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    showToast('Configurações salvas!', 'success');
+                    user.preferred_unit = unit;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    settingsModal.style.display = 'none';
+                    applyUserPreferences();
+                })
+                .catch(() => showToast('Erro ao salvar', 'error'));
+        });
+    }
+
+    if (window.onclick) {
+        // Merge with existing logic if possible, or just append check
+        const oldClick = window.onclick;
+        window.onclick = (event) => {
+            oldClick(event);
+            if (event.target == settingsModal) settingsModal.style.display = 'none';
+        }
+    }
+
+
     document.getElementById('type-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        submitForm(`${API_URL}/gold-types`, { name: e.target.type_name.value }, () => {
+        submitForm(`${API_URL}/gold-types`, { name: e.target.type_name.value, user_id: getUserId() }, () => {
             showToast('Categoria adicionada!', 'success');
             modal.style.display = 'none';
             e.target.reset();
@@ -359,10 +500,17 @@ function setupEventListeners() {
         payload.append('user_id', getUserId());
 
         if (document.getElementById('delivery-check').checked) {
-            payload.append('delivery_courier', formData.get('delivery_courier'));
-            payload.append('courier_id', formData.get('courier_id'));
-            payload.append('delivery_cost', formData.get('delivery_cost'));
-            payload.append('delivery_time', formData.get('delivery_time'));
+            const courierId = formData.get('courier_id');
+            if (courierId) {
+                payload.append('courier_id', courierId);
+                // Look up fee from DOM or Fetch? DOM is faster if we store it.
+                // Let's refetch or stick it in option dataset.
+                const select = e.target.querySelector('.courier-select');
+                const option = select.options[select.selectedIndex];
+                const fee = option.dataset.fee || 0;
+                payload.append('delivery_cost', fee);
+                payload.append('delivery_courier', option.text); // Use name as text fallback
+            }
         }
 
         fetch(`${API_URL}/sell`, { method: 'POST', body: payload })
@@ -416,8 +564,20 @@ async function submitForm(url, data, onSuccess) {
 
 function getWeightInGrams(form) {
     let weight = parseFloat(form.weight.value);
-    if (form.unit.value === 'kg') weight *= 1000;
+    const unit = form.unit.value; // Now this comes from the select, which defaults to pref
+    if (unit === 'kg') weight *= 1000;
+    // if unit is 'g', weight is weight.
     return weight;
+}
+
+function applyUserPreferences() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const unit = user ? (user.preferred_unit || 'g') : 'g';
+
+    // Update all unit selects
+    document.querySelectorAll('select[name="unit"]').forEach(sel => {
+        sel.value = unit;
+    });
 }
 
 function formatCurrency(val) {
@@ -431,7 +591,9 @@ function formatDate(dateStr) {
 
 async function fetchGoldTypes() {
     try {
-        const res = await fetch(`${API_URL}/gold-types`);
+        const userId = getUserId();
+        if (!userId) return;
+        const res = await fetch(`${API_URL}/gold-types?user_id=${userId}`);
         const types = await res.json();
         const selects = document.querySelectorAll('.gold-type-select');
         selects.forEach(sel => {
