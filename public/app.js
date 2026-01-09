@@ -128,16 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('register-form');
     if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
-    // Force load for debug
-    console.log('Forcing App Load...');
-    document.getElementById('main-app').style.display = 'block';
-    loadApp();
-
-    /* 
+    // Initial Check
     if (checkLogin()) {
         loadApp();
     }
-    */
 });
 
 function loadApp() {
