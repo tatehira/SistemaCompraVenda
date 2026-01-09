@@ -634,6 +634,25 @@ function applyUserPreferences() {
     document.querySelectorAll('select[name="unit"]').forEach(sel => {
         sel.value = unit;
     });
+
+    // Apply Theme
+    const theme = localStorage.getItem('theme') || 'dark';
+    if (theme === 'light') {
+        document.body.setAttribute('data-theme', 'light');
+    } else {
+        document.body.removeAttribute('data-theme');
+    }
+}
+
+function toggleTheme() {
+    const current = document.body.getAttribute('data-theme');
+    if (current === 'light') {
+        document.body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.body.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+    }
 }
 
 function formatCurrency(val) {
