@@ -70,6 +70,11 @@ function checkLogin() {
 
 function handleLogin(e) {
     e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerText;
+    btn.innerText = 'Entrando...';
+    btn.disabled = true;
+
     const username = e.target.username.value;
     const password = e.target.password.value;
 
@@ -86,10 +91,14 @@ function handleLogin(e) {
                 checkLogin();
                 loadApp();
             } else {
-                showToast('Credenciais inválidas', 'error');
+                showToast(data.error || 'Credenciais inválidas', 'error');
             }
         })
-        .catch(() => showToast('Erro de conexão', 'error'));
+        .catch(() => showToast('Erro de conexão. Verifique se o servidor está rodando.', 'error'))
+        .finally(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
 }
 
 function handleRegister(e) {
