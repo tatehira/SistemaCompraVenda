@@ -164,9 +164,20 @@ function loadApp() {
 }
 
 // --- DATA FETCHING & UI ---
+// --- HELPER TO GET USER ID ---
+function getUserId() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        return user ? user.id : null;
+    } catch (e) { return null; }
+}
+
+// --- DATA FETCHING & UI ---
 async function fetchPoints() {
     try {
-        const res = await fetch(`${API_URL}/points`);
+        const userId = getUserId();
+        if (!userId) return;
+        const res = await fetch(`${API_URL}/points?user_id=${userId}`);
         const points = await res.json();
         const selects = document.querySelectorAll('.point-select');
         selects.forEach(sel => {
@@ -183,7 +194,9 @@ async function fetchPoints() {
 
 async function fetchCouriers() {
     try {
-        const res = await fetch(`${API_URL}/couriers`);
+        const userId = getUserId();
+        if (!userId) return;
+        const res = await fetch(`${API_URL}/couriers?user_id=${userId}`);
         const couriers = await res.json();
         const selects = document.querySelectorAll('.courier-select');
         selects.forEach(sel => {
@@ -200,9 +213,12 @@ async function fetchCouriers() {
 async function fetchStockDetails() {
     const container = document.getElementById('stock-details-container');
     if (!container) return;
+    const userId = getUserId();
+    if (!userId) return;
+
     container.innerHTML = '<p>Carregando...</p>';
     try {
-        const res = await fetch(`${API_URL}/stock-details`);
+        const res = await fetch(`${API_URL}/stock-details?user_id=${userId}`);
         const data = await res.json();
         let html = '';
         for (const [point, goldMap] of Object.entries(data)) {
@@ -263,7 +279,11 @@ function setupEventListeners() {
 
     document.getElementById('point-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const payload = { name: e.target.name.value, address: e.target.address.value };
+        const payload = {
+            name: e.target.name.value,
+            address: e.target.address.value,
+            user_id: getUserId()
+        };
         submitForm(`${API_URL}/points`, payload, () => {
             showToast('Ponto adicionado!', 'success');
             e.target.reset();
@@ -276,7 +296,8 @@ function setupEventListeners() {
         const payload = {
             name: e.target.name.value,
             phone: e.target.phone.value,
-            default_fee: e.target.default_fee.value
+            default_fee: e.target.default_fee.value,
+            user_id: getUserId()
         };
         submitForm(`${API_URL}/couriers`, payload, () => {
             showToast('Motoboy adicionado!', 'success');
@@ -288,6 +309,7 @@ function setupEventListeners() {
     document.getElementById('adjust-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
+        formData.append('user_id', getUserId());
         submitForm(`${API_URL}/stock-correction`, Object.fromEntries(formData), () => {
             showToast('Estoque ajustado!', 'success');
             adjustModal.style.display = 'none';
@@ -307,6 +329,7 @@ function setupEventListeners() {
         payload.append('weight_grams', weight);
         payload.append('price', formData.get('price'));
         payload.append('customer_name', formData.get('customer'));
+        payload.append('user_id', getUserId());
 
         fetch(`${API_URL}/buy`, { method: 'POST', body: payload })
             .then(res => {
@@ -333,6 +356,7 @@ function setupEventListeners() {
         payload.append('price', formData.get('price'));
         payload.append('customer_name', formData.get('customer'));
         payload.append('date', formData.get('date'));
+        payload.append('user_id', getUserId());
 
         if (document.getElementById('delivery-check').checked) {
             payload.append('delivery_courier', formData.get('delivery_courier'));
@@ -361,8 +385,11 @@ function setupEventListeners() {
         e.preventDefault();
         const start = e.target.start_date.value;
         const end = e.target.end_date.value;
+        const userId = getUserId();
+        if (!userId) return;
+
         try {
-            const res = await fetch(`${API_URL}/transactions`);
+            const res = await fetch(`${API_URL}/transactions?user_id=${userId}`);
             const transactions = await res.json();
             const filtered = transactions.filter(tx => {
                 const txDate = tx.date.split('T')[0];
@@ -419,9 +446,11 @@ async function fetchGoldTypes() {
 // Updated Stats Logic
 async function updateStats() {
     try {
+        const userId = getUserId();
+        if (!userId) return;
         const [invRes, txRes] = await Promise.all([
-            fetch(`${API_URL}/inventory`),
-            fetch(`${API_URL}/transactions`)
+            fetch(`${API_URL}/inventory?user_id=${userId}`),
+            fetch(`${API_URL}/transactions?user_id=${userId}`)
         ]);
         const inventory = await invRes.json();
         const transactions = await txRes.json();
@@ -470,7 +499,9 @@ async function updateStats() {
 
 async function updateTransactions() {
     try {
-        const res = await fetch(`${API_URL}/transactions`);
+        const userId = getUserId();
+        if (!userId) return;
+        const res = await fetch(`${API_URL}/transactions?user_id=${userId}`);
         const txs = await res.json();
         const tbody = document.getElementById('transactions-body');
         if (!tbody) return;
@@ -498,7 +529,9 @@ async function updateTransactions() {
 
 async function loadChart() {
     try {
-        const res = await fetch(`${API_URL}/analytics`);
+        const userId = getUserId();
+        if (!userId) return;
+        const res = await fetch(`${API_URL}/analytics?user_id=${userId}`);
         const data = await res.json();
         const ctx = document.getElementById('movementChart');
         if (!ctx) return;

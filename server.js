@@ -66,15 +66,17 @@ app.post('/api/register', (req, res) => {
 
 // --- Points (Branches) Endpoints ---
 app.get('/api/points', (req, res) => {
-    db.all("SELECT * FROM points", [], (err, rows) => {
+    const userId = req.query.user_id;
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+    db.all("SELECT * FROM points WHERE user_id = ?", [userId], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
 });
 
 app.post('/api/points', (req, res) => {
-    const { name, address } = req.body;
-    db.run("INSERT INTO points (name, address) VALUES (?, ?)", [name, address], function (err) {
+    const { name, address, user_id } = req.body;
+    db.run("INSERT INTO points (name, address, user_id) VALUES (?, ?, ?)", [name, address, user_id], function (err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ id: this.lastID, name, address });
     });
@@ -82,21 +84,23 @@ app.post('/api/points', (req, res) => {
 
 // --- Couriers Endpoints ---
 app.get('/api/couriers', (req, res) => {
-    db.all("SELECT * FROM couriers", [], (err, rows) => {
+    const userId = req.query.user_id;
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+    db.all("SELECT * FROM couriers WHERE user_id = ?", [userId], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
 });
 
 app.post('/api/couriers', (req, res) => {
-    const { name, phone, default_fee } = req.body;
-    db.run("INSERT INTO couriers (name, phone, default_fee) VALUES (?, ?, ?)", [name, phone, default_fee], function (err) {
+    const { name, phone, default_fee, user_id } = req.body;
+    db.run("INSERT INTO couriers (name, phone, default_fee, user_id) VALUES (?, ?, ?, ?)", [name, phone, default_fee, user_id], function (err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ id: this.lastID, name, phone, default_fee });
     });
 });
 
-// Get Gold Types
+// Get Gold Types (Shared for now, but could be isolated if needed)
 app.get('/api/gold-types', (req, res) => {
     db.all(`SELECT * FROM gold_types`, [], (err, rows) => {
         if (err) {
@@ -121,6 +125,9 @@ app.post('/api/gold-types', (req, res) => {
 
 // Get Inventory Status (Grouped by Gold Type)
 app.get('/api/inventory', (req, res) => {
+    const userId = req.query.user_id;
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+
     // We want stock per gold type.
     const sql = `
         SELECT 
@@ -130,10 +137,11 @@ app.get('/api/inventory', (req, res) => {
             SUM(t.weight_grams) as total_weight 
         FROM transactions t
         LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        WHERE t.user_id = ?
         GROUP BY t.gold_type_id, t.type
     `;
 
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [userId], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -162,13 +170,17 @@ app.get('/api/inventory', (req, res) => {
 
 // Get All Transactions
 app.get('/api/transactions', (req, res) => {
+    const userId = req.query.user_id;
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+
     const sql = `
         SELECT t.*, gt.name as gold_type_name 
         FROM transactions t 
         LEFT JOIN gold_types gt ON t.gold_type_id = gt.id 
+        WHERE t.user_id = ?
         ORDER BY date DESC
     `;
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [userId], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -179,12 +191,14 @@ app.get('/api/transactions', (req, res) => {
 
 // Register Purchase (Buy Gold)
 app.post('/api/buy', upload.single('receipt'), (req, res) => {
-    const { weight_grams, price, date, gold_type_id, customer_name, point_id } = req.body;
+    const { weight_grams, price, date, gold_type_id, customer_name, point_id, user_id } = req.body;
     const receipt_path = req.file ? req.file.path : null;
     const final_customer = customer_name || 'Fornecedor';
 
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    const params = ['BUY', weight_grams, price, final_customer, receipt_path, date || new Date().toISOString(), gold_type_id, point_id || 1];
+    if (!user_id) return res.status(400).json({ error: 'User ID required' });
+
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const params = ['BUY', weight_grams, price, final_customer, receipt_path, date || new Date().toISOString(), gold_type_id, point_id || 1, user_id];
 
     db.run(sql, params, function (err) {
         if (err) {
@@ -197,10 +211,12 @@ app.post('/api/buy', upload.single('receipt'), (req, res) => {
 
 // Register Sale (Sell)
 app.post('/api/sell', upload.single('receipt'), (req, res) => {
-    const { weight_grams, price, customer_name, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id } = req.body;
+    const { weight_grams, price, customer_name, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id, user_id } = req.body;
     const receipt_path = req.file ? req.file.path : null;
 
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    if (!user_id) return res.status(400).json({ error: 'User ID required' });
+
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
         'SELL',
         weight_grams,
@@ -213,7 +229,8 @@ app.post('/api/sell', upload.single('receipt'), (req, res) => {
         delivery_cost || 0,
         delivery_time || null,
         point_id || 1,
-        courier_id || null
+        courier_id || null,
+        user_id
     ];
 
     db.run(sql, params, function (err) {
@@ -260,21 +277,15 @@ app.put('/api/transactions/:id', (req, res) => {
 
 // Stock Correction (Add/Remove Stock manually)
 app.post('/api/stock-correction', (req, res) => {
-    const { gold_type_id, weight_grams, reason } = req.body;
-    // We can simulate this as a 'BUY' (add) or 'SELL' (remove) with special flag or just 0 price?
-    // User wants "adjust". Let's create a transaction type 'ADJUST' or just use BUY/SELL with 0 price and note.
-    // Better: type='ADJUST'.
-    // NOTE: 'type' column check in previous code was just 'BUY'/'SELL' strings, so 'ADJUST' is fine if I didn't enforce CHECK constraint. Creating table query didn't force CHECK.
+    const { gold_type_id, weight_grams, reason, user_id, point_id } = req.body;
 
-    const type = weight_grams >= 0 ? 'BUY' : 'SELL'; // Or 'ADJUST'? 
-    // If I use 'ADJUST', I need to update Inventory logic.
-    // Let's use 'BUY'/'SELL' but with 0 price and customer_name as "AJUSTE DE ESTOQUE".
+    if (!user_id) return res.status(400).json({ error: 'User ID required' });
 
     const finalWeight = Math.abs(weight_grams);
     const finalType = weight_grams >= 0 ? 'BUY' : 'SELL';
 
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, date, gold_type_id, point_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const params = [finalType, finalWeight, 0, `AJUSTE: ${reason}`, new Date().toISOString(), gold_type_id, point_id || 1];
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, date, gold_type_id, point_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    const params = [finalType, finalWeight, 0, `AJUSTE: ${reason}`, new Date().toISOString(), gold_type_id, point_id || 1, user_id];
 
     db.run(sql, params, function (err) {
         if (err) {
@@ -287,15 +298,19 @@ app.post('/api/stock-correction', (req, res) => {
 
 // Detailed Stock View (New)
 app.get('/api/stock-details', (req, res) => {
+    const userId = req.query.user_id;
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+
     // Get stock grouped by Point and Gold Type
     const sql = `
         SELECT p.name as point_name, gt.name as gold_type_name, t.type, SUM(t.weight_grams) as total_weight
         FROM transactions t
         LEFT JOIN points p ON t.point_id = p.id
         LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        WHERE t.user_id = ?
         GROUP BY t.point_id, t.gold_type_id, t.type
     `;
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [userId], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
 
         // Process data
@@ -316,6 +331,9 @@ app.get('/api/stock-details', (req, res) => {
 
 // Analytics Endpoint
 app.get('/api/analytics', (req, res) => {
+    const userId = req.query.user_id;
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+
     // Group by Date (YYYY-MM-DD)
     const sql = `
         SELECT 
@@ -324,11 +342,12 @@ app.get('/api/analytics', (req, res) => {
             SUM(price) as total_price, 
             SUM(weight_grams) as total_weight 
         FROM transactions 
+        WHERE user_id = ?
         GROUP BY day, type 
         ORDER BY day ASC
     `;
 
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [userId], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;

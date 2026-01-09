@@ -32,7 +32,9 @@ function initializeSchema() {
         db.run(`CREATE TABLE IF NOT EXISTS points (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            address TEXT
+            address TEXT,
+            user_id INTEGER,
+            FOREIGN KEY(user_id) REFERENCES users(id)
         )`);
 
         // Couriers Table (Motoboys)
@@ -40,7 +42,9 @@ function initializeSchema() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             phone TEXT,
-            default_fee REAL
+            default_fee REAL,
+            user_id INTEGER,
+            FOREIGN KEY(user_id) REFERENCES users(id)
         )`);
 
         // Transactions Table (Updated)
@@ -58,23 +62,28 @@ function initializeSchema() {
             delivery_courier TEXT,
             delivery_cost REAL,
             delivery_time TEXT,
+            user_id INTEGER,
             FOREIGN KEY(gold_type_id) REFERENCES gold_types(id),
             FOREIGN KEY(point_id) REFERENCES points(id),
-            FOREIGN KEY(courier_id) REFERENCES couriers(id)
+            FOREIGN KEY(courier_id) REFERENCES couriers(id),
+            FOREIGN KEY(user_id) REFERENCES users(id)
         )`);
 
         // Add new columns if they don't exist (Migration)
         const columnsToAdd = [
-            { name: 'gold_type_id', type: 'INTEGER' },
-            { name: 'point_id', type: 'INTEGER' },
-            { name: 'courier_id', type: 'INTEGER' },
-            { name: 'delivery_courier', type: 'TEXT' },
-            { name: 'delivery_cost', type: 'REAL' },
-            { name: 'delivery_time', type: 'TEXT' }
+            { table: 'transactions', name: 'gold_type_id', type: 'INTEGER' },
+            { table: 'transactions', name: 'point_id', type: 'INTEGER' },
+            { table: 'transactions', name: 'courier_id', type: 'INTEGER' },
+            { table: 'transactions', name: 'delivery_courier', type: 'TEXT' },
+            { table: 'transactions', name: 'delivery_cost', type: 'REAL' },
+            { table: 'transactions', name: 'delivery_time', type: 'TEXT' },
+            { table: 'transactions', name: 'user_id', type: 'INTEGER' },
+            { table: 'points', name: 'user_id', type: 'INTEGER' },
+            { table: 'couriers', name: 'user_id', type: 'INTEGER' }
         ];
 
         columnsToAdd.forEach(col => {
-            db.run(`ALTER TABLE transactions ADD COLUMN ${col.name} ${col.type}`, (err) => {
+            db.run(`ALTER TABLE ${col.table || 'transactions'} ADD COLUMN ${col.name} ${col.type}`, (err) => {
                 if (err && !err.message.includes('duplicate column')) {
                     // console.error(`Error adding column ${col.name}:`, err.message);
                 }
