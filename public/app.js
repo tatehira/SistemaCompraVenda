@@ -14,64 +14,211 @@ function showToast(message, type = 'info') {
     }, 4000);
 }
 
+// MAKE LOGOUT GLOBAL AND ROBUST
+window.logout = function () {
+    console.log('Logging out...');
+    localStorage.removeItem('user');
+    location.href = '/'; // Hard reload to root
+};
+
 // Global Tab Navigation
 window.switchTab = function (tabId) {
-    // Hide all views
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-    // Remove active class from nav buttons
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-
-    // Show selected view
     document.getElementById(`view-${tabId}`).classList.add('active');
-
-    // Highlight button
-    const btns = document.querySelectorAll('.nav-btn');
-    btns.forEach(btn => {
-        if (btn.getAttribute('onclick').includes(tabId)) {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
             btn.classList.add('active');
         }
     });
-};
-
-// Open Edit Modal
-window.openEditModal = function (tx) {
-    const editModal = document.getElementById('edit-modal');
-    const form = document.getElementById('edit-form');
-
-    form.id.value = tx.id;
-    form.type.value = tx.type;
-    form.date.value = tx.date.split('T')[0];
-    form.gold_type_id.value = tx.gold_type_id;
-    form.weight_grams.value = tx.weight_grams;
-    form.price.value = tx.price;
-    form.customer_name.value = tx.customer_name || '';
-
-    if (tx.type === 'SELL') {
-        document.getElementById('edit-sale-fields').style.display = 'block';
-        form.delivery_courier.value = tx.delivery_courier || '';
-        form.delivery_cost.value = tx.delivery_cost || '';
-        form.delivery_time.value = tx.delivery_time || '';
-    } else {
-        document.getElementById('edit-sale-fields').style.display = 'none';
-        form.delivery_courier.value = '';
-        form.delivery_cost.value = '';
-        form.delivery_time.value = '';
+    // Refresh specific views
+    if (tabId === 'stock') fetchStockDetails();
+    if (tabId === 'actions') {
+        fetchPoints();
+        fetchCouriers();
     }
-    editModal.style.display = 'flex';
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Initial Load
-    fetchGoldTypes();
-    updateStats();
-    updateTransactions();
-    loadChart();
+window.toggleAuth = function (mode) {
+    if (mode === 'register') {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('register-section').style.display = 'block';
+    } else {
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('register-section').style.display = 'none';
+    }
+};
 
-    // -- Modal Logic --
+// --- AUTHENTICATION ---
+function checkLogin() {
+    try {
+        const user = localStorage.getItem('user');
+        if (user) {
+            document.getElementById('view-login').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            return true;
+        } else {
+            document.getElementById('view-login').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+            return false;
+        }
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const username = e.target.username.value;
+    const password = e.target.password.value;
+
+    fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+                showToast('Login realizado com sucesso!', 'success');
+                checkLogin();
+                loadApp();
+            } else {
+                showToast('Credenciais inválidas', 'error');
+            }
+        })
+        .catch(() => showToast('Erro de conexão', 'error'));
+}
+
+function handleRegister(e) {
+    e.preventDefault();
+    const username = e.target.username.value;
+    const password = e.target.password.value;
+
+    fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.id) {
+                showToast('Conta criada! Faça login.', 'success');
+                toggleAuth('login');
+                const loginInput = document.querySelector('#login-form input[name="username"]');
+                if (loginInput) loginInput.value = username;
+            } else {
+                showToast(data.error || 'Erro ao cadastrar', 'error');
+            }
+        })
+        .catch(() => showToast('Erro de conexão', 'error'));
+}
+
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Ready');
+
+    // Login Handling
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+
+    // Register Handling
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) registerForm.addEventListener('submit', handleRegister);
+
+    // Force load for debug
+    console.log('Forcing App Load...');
+    document.getElementById('main-app').style.display = 'block';
+    loadApp();
+
+    /* 
+    if (checkLogin()) {
+        loadApp();
+    }
+    */
+});
+
+function loadApp() {
+    console.log('Loading app data...');
+    try {
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        if (user) showToast(`Bem-vindo, ${user.username}!`, 'success');
+
+        fetchGoldTypes().catch(e => console.error(e));
+        fetchPoints().catch(e => console.error(e));
+        fetchCouriers().catch(e => console.error(e));
+        updateStats().catch(e => console.error(e));
+        updateTransactions().catch(e => console.error(e));
+        loadChart().catch(e => console.error(e));
+        setupEventListeners();
+    } catch (e) {
+        console.error(e);
+        showToast('Erro ao carregar aplicação', 'error');
+    }
+}
+
+// --- DATA FETCHING & UI ---
+async function fetchPoints() {
+    try {
+        const res = await fetch(`${API_URL}/points`);
+        const points = await res.json();
+        const selects = document.querySelectorAll('.point-select');
+        selects.forEach(sel => {
+            const current = sel.value;
+            sel.innerHTML = points.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            if (current) sel.value = current;
+        });
+        const list = document.getElementById('points-list');
+        if (list) {
+            list.innerHTML = points.map(p => `<li><strong>${p.name}</strong> - ${p.address}</li>`).join('');
+        }
+    } catch (e) { console.error(e); }
+}
+
+async function fetchCouriers() {
+    try {
+        const res = await fetch(`${API_URL}/couriers`);
+        const couriers = await res.json();
+        const selects = document.querySelectorAll('.courier-select');
+        selects.forEach(sel => {
+            sel.innerHTML = '<option value="">Selecione...</option>' +
+                couriers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        });
+        const list = document.getElementById('couriers-list');
+        if (list) {
+            list.innerHTML = couriers.map(c => `<li>${c.name} (${c.phone || '-'}) - Taxa: R$ ${c.default_fee || 0}</li>`).join('');
+        }
+    } catch (e) { console.error(e); }
+}
+
+async function fetchStockDetails() {
+    const container = document.getElementById('stock-details-container');
+    if (!container) return;
+    container.innerHTML = '<p>Carregando...</p>';
+    try {
+        const res = await fetch(`${API_URL}/stock-details`);
+        const data = await res.json();
+        let html = '';
+        for (const [point, goldMap] of Object.entries(data)) {
+            html += `<div style="margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px;"><h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">📍 ${point}</h3><div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">`;
+            for (const [gold, quantity] of Object.entries(goldMap)) {
+                html += `<div style="background: rgba(15, 23, 42, 0.8); padding: 1rem; border-radius: 8px; text-align: center;"><div style="font-size: 0.9rem; color: var(--text-secondary);">${gold}</div><div style="font-size: 1.2rem; font-weight: bold;">${quantity.toFixed(2)} g</div></div>`;
+            }
+            html += `</div></div>`;
+        }
+        container.innerHTML = html || '<p>Sem estoque registrado.</p>';
+    } catch (e) {
+        container.innerHTML = '<p style="color:red">Erro ao carregar estoque.</p>';
+    }
+}
+
+function setupEventListeners() {
     const modal = document.getElementById('type-modal');
     const btnAddType = document.getElementById('btn-add-type');
     const closeModalType = document.getElementById('close-type');
-
     if (btnAddType) btnAddType.onclick = () => modal.style.display = 'flex';
     if (closeModalType) closeModalType.onclick = () => modal.style.display = 'none';
 
@@ -81,20 +228,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAdjust) btnAdjust.onclick = () => adjustModal.style.display = 'flex';
     if (closeAdjust) closeAdjust.onclick = () => adjustModal.style.display = 'none';
 
-
-
     const editModal = document.getElementById('edit-modal');
     const closeEditModal = document.getElementById('close-edit');
     if (closeEditModal) closeEditModal.onclick = () => editModal.style.display = 'none';
 
-    // Global Click to Close Modals
     window.onclick = (event) => {
         if (event.target == modal) modal.style.display = 'none';
         if (event.target == editModal) editModal.style.display = 'none';
         if (event.target == adjustModal) adjustModal.style.display = 'none';
     }
 
-    // Toggle delivery fields
     const deliveryCheck = document.getElementById('delivery-check');
     if (deliveryCheck) {
         deliveryCheck.addEventListener('change', function () {
@@ -102,235 +245,175 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Set Date Default
-    const dateInput = document.querySelector('input[name="date"]');
-    if (dateInput) dateInput.valueAsDate = new Date();
+    const dateInputs = document.querySelectorAll('input[name="date"]');
+    dateInputs.forEach(input => input.valueAsDate = new Date());
 
-    // -- Forms Submission --
-
-    // Add New Type
-    const typeForm = document.getElementById('type-form');
-    if (typeForm) {
-        typeForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = e.target.type_name.value;
-            try {
-                const res = await fetch(`${API_URL}/gold-types`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name })
-                });
-                if (res.ok) {
-                    showToast('Categoria adicionada!', 'success');
-                    modal.style.display = 'none';
-                    e.target.reset();
-                    fetchGoldTypes();
-                } else {
-                    showToast('Erro ao salvar.', 'error');
-                }
-            } catch (err) {
-                showToast('Erro de conexão.', 'error');
-            }
+    document.getElementById('type-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        submitForm(`${API_URL}/gold-types`, { name: e.target.type_name.value }, () => {
+            showToast('Categoria adicionada!', 'success');
+            modal.style.display = 'none';
+            e.target.reset();
+            fetchGoldTypes();
         });
-    }
+    });
 
-    // Adjust Stock
-    const adjustForm = document.getElementById('adjust-form');
-    if (adjustForm) {
-        adjustForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const payload = Object.fromEntries(formData.entries());
-            try {
-                const res = await fetch(`${API_URL}/stock-correction`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    showToast('Estoque ajustado!', 'success');
-                    adjustModal.style.display = 'none';
-                    e.target.reset();
-                    updateStats();
-                    updateTransactions();
-                } else {
-                    showToast('Erro ao ajustar.', 'error');
-                }
-            } catch (err) {
-                showToast('Erro de conexão.', 'error');
-            }
+    document.getElementById('point-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = { name: e.target.name.value, address: e.target.address.value };
+        submitForm(`${API_URL}/points`, payload, () => {
+            showToast('Ponto adicionado!', 'success');
+            e.target.reset();
+            fetchPoints();
         });
-    }
+    });
 
-    // Buy Form
-    const buyForm = document.getElementById('buy-form');
-    if (buyForm) {
-        buyForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const weightGrams = getWeightInGrams(e.target);
-            const payload = new FormData();
-            payload.append('gold_type_id', formData.get('gold_type'));
-            payload.append('weight_grams', weightGrams);
-            payload.append('price', formData.get('price'));
-            payload.append('customer_name', formData.get('customer'));
-            if (formData.get('receipt') && formData.get('receipt').size > 0) payload.append('receipt', formData.get('receipt'));
+    document.getElementById('courier-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            name: e.target.name.value,
+            phone: e.target.phone.value,
+            default_fee: e.target.default_fee.value
+        };
+        submitForm(`${API_URL}/couriers`, payload, () => {
+            showToast('Motoboy adicionado!', 'success');
+            e.target.reset();
+            fetchCouriers();
+        });
+    });
 
-            try {
-                const res = await fetch(`${API_URL}/buy`, { method: 'POST', body: payload });
+    document.getElementById('adjust-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        submitForm(`${API_URL}/stock-correction`, Object.fromEntries(formData), () => {
+            showToast('Estoque ajustado!', 'success');
+            adjustModal.style.display = 'none';
+            e.target.reset();
+            updateStats();
+            updateTransactions();
+        });
+    });
+
+    document.getElementById('buy-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const weight = getWeightInGrams(e.target);
+        const payload = new FormData();
+        payload.append('point_id', formData.get('point_id'));
+        payload.append('gold_type_id', formData.get('gold_type'));
+        payload.append('weight_grams', weight);
+        payload.append('price', formData.get('price'));
+        payload.append('customer_name', formData.get('customer'));
+
+        fetch(`${API_URL}/buy`, { method: 'POST', body: payload })
+            .then(res => {
                 if (res.ok) {
                     showToast('Entrada registrada!', 'success');
                     e.target.reset();
                     updateStats();
                     updateTransactions();
                 } else {
-                    const err = await res.json();
-                    showToast('Erro: ' + err.error, 'error');
+                    res.json().then(d => showToast(d.error, 'error'));
                 }
-            } catch (error) {
-                showToast('Erro de conexão.', 'error');
-            }
-        });
-    }
+            })
+            .catch(() => showToast('Erro de conexão', 'error'));
+    });
 
-    // Sell Form
-    const sellForm = document.getElementById('sell-form');
-    if (sellForm) {
-        sellForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const weightGrams = getWeightInGrams(e.target);
-            const payload = new FormData();
-            payload.append('gold_type_id', formData.get('gold_type'));
-            payload.append('customer_name', formData.get('customer'));
-            payload.append('weight_grams', weightGrams);
-            payload.append('price', formData.get('price'));
-            payload.append('date', formData.get('date'));
-            if (document.getElementById('delivery-check').checked) {
-                payload.append('delivery_courier', formData.get('delivery_courier'));
-                payload.append('delivery_cost', formData.get('delivery_cost'));
-                payload.append('delivery_time', formData.get('delivery_time'));
-            }
-            if (formData.get('receipt') && formData.get('receipt').size > 0) payload.append('receipt', formData.get('receipt'));
+    document.getElementById('sell-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const weight = getWeightInGrams(e.target);
+        const payload = new FormData();
+        payload.append('point_id', formData.get('point_id'));
+        payload.append('gold_type_id', formData.get('gold_type'));
+        payload.append('weight_grams', weight);
+        payload.append('price', formData.get('price'));
+        payload.append('customer_name', formData.get('customer'));
+        payload.append('date', formData.get('date'));
 
-            try {
-                const res = await fetch(`${API_URL}/sell`, { method: 'POST', body: payload });
+        if (document.getElementById('delivery-check').checked) {
+            payload.append('delivery_courier', formData.get('delivery_courier'));
+            payload.append('courier_id', formData.get('courier_id'));
+            payload.append('delivery_cost', formData.get('delivery_cost'));
+            payload.append('delivery_time', formData.get('delivery_time'));
+        }
+
+        fetch(`${API_URL}/sell`, { method: 'POST', body: payload })
+            .then(res => {
                 if (res.ok) {
                     showToast('Saída registrada!', 'success');
                     e.target.reset();
-                    document.querySelector('input[name="date"]').valueAsDate = new Date();
                     document.getElementById('delivery-fields').style.display = 'none';
                     updateStats();
                     updateTransactions();
                     loadChart();
                 } else {
-                    const err = await res.json();
-                    showToast('Erro: ' + err.error, 'error');
+                    res.json().then(d => showToast(d.error, 'error'));
                 }
-            } catch (error) {
-                showToast('Erro de conexão.', 'error');
-            }
-        });
-    }
+            })
+            .catch(() => showToast('Erro de conexão', 'error'));
+    });
 
-    // Edit Form
-    const editForm = document.getElementById('edit-form');
-    if (editForm) {
-        editForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const id = formData.get('id');
-            const payload = {};
-            formData.forEach((value, key) => payload[key] = value);
-            try {
-                const res = await fetch(`${API_URL}/transactions/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    showToast('Atualizado com sucesso!', 'success');
-                    editModal.style.display = 'none';
-                    updateStats();
-                    updateTransactions();
-                } else {
-                    showToast('Erro ao atualizar.', 'error');
-                }
-            } catch (err) {
-                showToast('Erro de conexão.', 'error');
-            }
-        });
-    }
-
-    // Report Form
-    const reportForm = document.getElementById('report-form');
-    if (reportForm) {
-        reportForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const start = e.target.start_date.value;
-            const end = e.target.end_date.value;
-            try {
-                const res = await fetch(`${API_URL}/transactions`);
-                const transactions = await res.json();
-                const filtered = transactions.filter(tx => {
-                    const txDate = tx.date.split('T')[0];
-                    return txDate >= start && txDate <= end;
-                });
-                generatePrintableReport(filtered, start, end);
-
-            } catch (err) {
-                showToast('Erro ao gerar relatório.', 'error');
-            }
-        });
-    }
-
-}); // End DOMContentLoaded
-
-// -- Helper Functions --
-
-function formatCurrency(value) {
-    if (value === null || value === undefined) return 'R$ 0,00';
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    document.getElementById('report-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const start = e.target.start_date.value;
+        const end = e.target.end_date.value;
+        try {
+            const res = await fetch(`${API_URL}/transactions`);
+            const transactions = await res.json();
+            const filtered = transactions.filter(tx => {
+                const txDate = tx.date.split('T')[0];
+                return txDate >= start && txDate <= end;
+            });
+            generatePrintableReport(filtered, start, end);
+        } catch (err) { console.error(err); }
+    });
 }
 
-function formatDate(dateStr) {
-    if (!dateStr) return '-';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+// --- HELPERS ---
+
+async function submitForm(url, data, onSuccess) {
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (res.ok) onSuccess();
+        else showToast('Erro ao salvar', 'error');
+    } catch (e) { showToast('Erro de conexão', 'error'); }
 }
 
 function getWeightInGrams(form) {
     let weight = parseFloat(form.weight.value);
-    const unit = form.unit.value;
-    if (unit === 'kg') {
-        weight = weight * 1000;
-    }
+    if (form.unit.value === 'kg') weight *= 1000;
     return weight;
 }
 
-// Function to populate Gold Type dropdowns
-async function fetchGoldTypes() {
-    try {
-        const response = await fetch(`${API_URL}/gold-types`);
-        const types = await response.json();
-        const selects = document.querySelectorAll('.gold-type-select');
-        selects.forEach(select => {
-            const currentVal = select.value;
-            select.innerHTML = '<option value="" disabled selected>Selecione...</option>';
-            types.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type.id;
-                option.textContent = type.name;
-                select.appendChild(option);
-            });
-            if (currentVal) select.value = currentVal;
-        });
-    } catch (error) {
-        console.error('Error fetching types', error);
-    }
+function formatCurrency(val) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
 }
 
-// Update Stats
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    return new Date(dateStr).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+}
+
+async function fetchGoldTypes() {
+    try {
+        const res = await fetch(`${API_URL}/gold-types`);
+        const types = await res.json();
+        const selects = document.querySelectorAll('.gold-type-select');
+        selects.forEach(sel => {
+            const cur = sel.value;
+            sel.innerHTML = '<option value="" disabled selected>Selecione...</option>' +
+                types.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            if (cur) sel.value = cur;
+        });
+    } catch (e) { console.error(e); }
+}
+
+// Updated Stats Logic
 async function updateStats() {
     try {
         const [invRes, txRes] = await Promise.all([
@@ -342,194 +425,127 @@ async function updateStats() {
 
         let balance = 0;
         transactions.forEach(tx => {
-            if (tx.type === 'SELL') {
-                balance += (tx.price - (tx.delivery_cost || 0));
-            } else if (tx.type === 'BUY') {
-                balance -= tx.price;
-            }
+            if (tx.type === 'SELL') balance += (tx.price - (tx.delivery_cost || 0));
+            else if (tx.type === 'BUY') balance -= tx.price;
         });
 
         const container = document.getElementById('stats-container');
-        if (!container) return;
-        container.innerHTML = '';
-
-        // Balance Card
-        const balanceCard = document.createElement('div');
-        balanceCard.className = 'stat-card';
-        balanceCard.innerHTML = `
-            <div class="stat-value" style="color: ${balance >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">
-                ${formatCurrency(balance)}
-            </div>
-            <div class="stat-label">Saldo Caixa</div>
-        `;
-        container.appendChild(balanceCard);
-
-        // Inventory Cards
-        inventory.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'stat-card';
-            card.innerHTML = `
-                <div class="stat-value" style="color: var(--text-primary);">${item.total_weight.toFixed(2)} g</div>
-                <div class="stat-label">${item.type_name}</div>
+        if (container) {
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value" style="color: ${balance >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">
+                        ${formatCurrency(balance)}
+                    </div>
+                    <div class="stat-label">Saldo Caixa</div>
+                </div>
             `;
-            container.appendChild(card);
-        });
-
-    } catch (err) { console.error(err); }
+            // Add Top 3 Stock Items
+            Object.values(inventory).slice(0, 3).forEach(item => {
+                // Ensure item has needed props
+                if (item.stock !== undefined) {
+                    container.innerHTML += `
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: var(--text-primary);">${item.stock.toFixed(2)} g</div>
+                            <div class="stat-label">Estoque</div> 
+                        </div>
+                    `;
+                }
+            });
+            // Fix inventory loop - inventory from server is object { "Type": { stock: n, ... }, ... }
+            const items = Object.entries(inventory);
+            items.forEach(([key, val]) => {
+                container.innerHTML += `
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: var(--text-primary);">${val.stock.toFixed(2)} g</div>
+                        <div class="stat-label">${key}</div> 
+                    </div>
+                `;
+            });
+        }
+    } catch (e) { console.error(e); }
 }
 
-// Update Transactions
 async function updateTransactions() {
     try {
-        const response = await fetch(`${API_URL}/transactions`);
-        const transactions = await response.json();
+        const res = await fetch(`${API_URL}/transactions`);
+        const txs = await res.json();
         const tbody = document.getElementById('transactions-body');
         if (!tbody) return;
-        tbody.innerHTML = '';
-
-        transactions.forEach(tx => {
-            const tr = document.createElement('tr');
+        tbody.innerHTML = txs.map(tx => {
             const isBuy = tx.type === 'BUY';
-            let typeBadge = '';
-            if (tx.customer_name && tx.customer_name.includes('AJUSTE:')) {
-                typeBadge = '<span class="badge" style="background:#64748b; color:#fff">AJUSTE</span>';
-            } else {
-                typeBadge = isBuy
-                    ? '<span class="badge badge-buy">ENTRADA</span>'
-                    : '<span class="badge badge-sell">SAÍDA</span>';
-            }
+            const badge = tx.customer_name?.includes('AJUSTE')
+                ? '<span class="badge" style="background:#64748b; color:#fff">AJUSTE</span>'
+                : (isBuy ? '<span class="badge badge-buy">ENTRADA</span>' : '<span class="badge badge-sell">SAÍDA</span>');
 
-            const receiptHtml = tx.receipt_path
-                ? `<a href="/${tx.receipt_path}" target="_blank" style="color:var(--accent-primary)">Ver</a>`
-                : '-';
-
-            let deliveryInfo = '-';
-            if (tx.delivery_courier) {
-                deliveryInfo = `<small>${tx.delivery_courier}<br>${tx.delivery_time || ''}</small>`;
-            }
-
-            const txData = encodeURIComponent(JSON.stringify(tx));
-
-            tr.innerHTML = `
-                <td>${formatDate(tx.date)}</td>
-                <td>${typeBadge}</td>
-                <td>${tx.gold_type_name || '-'}</td>
-                <td>${tx.customer_name || '-'}</td>
-                <td>${tx.weight_grams.toFixed(2)}</td>
-                <td>${formatCurrency(tx.price)}</td>
-                <td>${deliveryInfo}</td>
-                <td>
-                    <button class="btn-icon" onclick="openEditModal(JSON.parse(decodeURIComponent('${txData}')))">
-                        ✏️
-                    </button>
-                </td>
+            return `
+                <tr>
+                    <td>${formatDate(tx.date)}</td>
+                    <td>${badge}</td>
+                    <td>${tx.gold_type_name || '-'}</td>
+                    <td>${tx.customer_name || '-'}</td>
+                    <td>${tx.weight_grams.toFixed(2)}</td>
+                    <td>${formatCurrency(tx.price)}</td>
+                    <td>${tx.delivery_courier ? `<small>${tx.delivery_courier}</small>` : '-'}</td>
+                    <td><button class="btn-icon">✏️</button></td> 
+                </tr>
             `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) { console.error(err); }
+        }).join('');
+    } catch (e) { console.error(e); }
 }
 
-// Load Chart
 async function loadChart() {
     try {
         const res = await fetch(`${API_URL}/analytics`);
         const data = await res.json();
-        const ctx = document.getElementById('movementChart').getContext('2d');
-        if (window.myChart) window.myChart.destroy();
+        const ctx = document.getElementById('movementChart');
+        if (!ctx) return;
 
-        window.myChart = new Chart(ctx, {
+        if (window.myChart) window.myChart.destroy();
+        window.myChart = new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: {
                 labels: data.labels,
                 datasets: [
-                    {
-                        label: 'Vendas (Qtd)',
-                        data: data.soldData,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    },
-                    {
-                        label: 'Entradas (Qtd)',
-                        data: data.boughtData,
-                        borderColor: '#22c55e',
-                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }
+                    { label: 'Vendas', data: data.soldData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true },
+                    { label: 'Entradas', data: data.boughtData, borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true }
                 ]
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { labels: { color: '#94a3b8' } }
-                },
-                scales: {
-                    y: {
-                        ticks: { color: '#94a3b8' },
-                        grid: { color: 'rgba(255,255,255,0.05)' }
-                    },
-                    x: {
-                        ticks: { color: '#94a3b8' },
-                        grid: { color: 'rgba(255,255,255,0.05)' }
-                    }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
         });
-    } catch (err) { console.error(err); }
+    } catch (e) { console.error(e); }
 }
 
-// Generate Report
 function generatePrintableReport(transactions, start, end) {
     const buying = transactions.filter(tx => tx.type === 'BUY' && !tx.customer_name?.includes('AJUSTE:'));
     const selling = transactions.filter(tx => tx.type === 'SELL' && !tx.customer_name?.includes('AJUSTE:'));
-    const adjustments = transactions.filter(tx => tx.customer_name?.includes('AJUSTE:'));
 
-    let html = `
+    const html = `
     <html>
     <head>
-        <title>Relatório - ${formatDate(start)} a ${formatDate(end)}</title>
-        <style>
-            body { font-family: sans-serif; padding: 20px; }
-            h1 { font-size: 20px; margin-bottom: 5px; }
-            h2 { font-size: 16px; margin-top: 20px; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-            th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-            th { background: #f0f0f0; }
-            .total { font-weight: bold; text-align: right; margin-top: 5px; }
-            .summary { display: flex; gap: 20px; margin-top: 20px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; }
-        </style>
+        <title>Relatório - ${formatDate(start)}</title>
+        <style>body { font-family: sans-serif; padding: 20px; } table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; } th, td { border: 1px solid #ddd; padding: 6px; } th { background: #f0f0f0; } .total { text-align: right; font-weight: bold; margin-top: 5px; }</style>
     </head>
     <body>
-        <h1>Relatório de Movimentação</h1>
-        <p>Período: ${formatDate(start)} até ${formatDate(end)}</p>
-
+        <h1>Relatório de Movimentação (${formatDate(start)} - ${formatDate(end)})</h1>
         <h2>Entradas</h2>
         <table>
             <thead><tr><th>Data</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Fornecedor</th></tr></thead>
-            <tbody>
-                ${buying.map(tx => `<tr><td>${formatDate(tx.date)}</td><td>${tx.gold_type_name}</td><td>${tx.weight_grams}</td><td>${formatCurrency(tx.price)}</td><td>${tx.customer_name}</td></tr>`).join('')}
-            </tbody>
+            <tbody>${buying.map(tx => `<tr><td>${formatDate(tx.date)}</td><td>${tx.gold_type_name}</td><td>${tx.weight_grams}</td><td>${formatCurrency(tx.price)}</td><td>${tx.customer_name}</td></tr>`).join('')}</tbody>
         </table>
-        <div class="total">Total: ${formatCurrency(buying.reduce((acc, tx) => acc + tx.price, 0))}</div>
+        <div class="total">Total Entradas: ${formatCurrency(buying.reduce((a, t) => a + t.price, 0))}</div>
 
         <h2>Saídas</h2>
         <table>
-            <thead><tr><th>Data</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Cliente</th><th>Entrega</th></tr></thead>
-            <tbody>
-                ${selling.map(tx => `<tr><td>${formatDate(tx.date)}</td><td>${tx.gold_type_name}</td><td>${tx.weight_grams}</td><td>${formatCurrency(tx.price)}</td><td>${tx.customer_name}</td><td>${tx.delivery_courier ? 'Sim' : '-'}</td></tr>`).join('')}
-            </tbody>
+            <thead><tr><th>Data</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Cliente</th></tr></thead>
+            <tbody>${selling.map(tx => `<tr><td>${formatDate(tx.date)}</td><td>${tx.gold_type_name}</td><td>${tx.weight_grams}</td><td>${formatCurrency(tx.price)}</td><td>${tx.customer_name}</td></tr>`).join('')}</tbody>
         </table>
-        <div class="total">Total: ${formatCurrency(selling.reduce((acc, tx) => acc + tx.price, 0))}</div>
+        <div class="total">Total Saídas: ${formatCurrency(selling.reduce((a, t) => a + t.price, 0))}</div>
         
-        <div class="summary">
-            <strong>Lucro Bruto: ${formatCurrency(selling.reduce((acc, tx) => acc + tx.price, 0) - buying.reduce((acc, tx) => acc + tx.price, 0))}</strong>
-        </div>
+        <br>
+        <strong>Lucro Bruto: ${formatCurrency(selling.reduce((a, t) => a + t.price, 0) - buying.reduce((a, t) => a + t.price, 0))}</strong>
         <script>window.print();</script>
     </body>
-    </html>
-    `;
+    </html>`;
     const win = window.open('', '_blank');
     win.document.write(html);
     win.document.close();

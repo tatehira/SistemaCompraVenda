@@ -32,6 +32,10 @@ const upload = multer({ storage: storage });
 
 // API Endpoints
 
+app.get('/login', (req, res) => {
+    res.redirect('/');
+});
+
 // --- Auth Endpoints ---
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
@@ -41,6 +45,21 @@ app.post('/api/login', (req, res) => {
         res.json({
             message: 'Login successful',
             user: { id: row.id, username: row.username, role: row.role }
+        });
+    });
+});
+
+app.post('/api/register', (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) return res.status(400).json({ error: 'Preencha todos os campos' });
+
+    db.get("SELECT * FROM users WHERE username = ?", [username], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (row) return res.status(400).json({ error: 'Usuário já existe' });
+
+        db.run("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", [username, password, 'admin'], function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ message: 'User created', id: this.lastID });
         });
     });
 });
@@ -254,8 +273,8 @@ app.post('/api/stock-correction', (req, res) => {
     const finalWeight = Math.abs(weight_grams);
     const finalType = weight_grams >= 0 ? 'BUY' : 'SELL';
 
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, date, gold_type_id) VALUES (?, ?, ?, ?, ?, ?)`;
-    const params = [finalType, finalWeight, 0, `AJUSTE: ${reason}`, new Date().toISOString(), gold_type_id];
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, date, gold_type_id, point_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const params = [finalType, finalWeight, 0, `AJUSTE: ${reason}`, new Date().toISOString(), gold_type_id, point_id || 1];
 
     db.run(sql, params, function (err) {
         if (err) {
@@ -263,6 +282,35 @@ app.post('/api/stock-correction', (req, res) => {
             return;
         }
         res.json({ message: 'Stock adjusted' });
+    });
+});
+
+// Detailed Stock View (New)
+app.get('/api/stock-details', (req, res) => {
+    // Get stock grouped by Point and Gold Type
+    const sql = `
+        SELECT p.name as point_name, gt.name as gold_type_name, t.type, SUM(t.weight_grams) as total_weight
+        FROM transactions t
+        LEFT JOIN points p ON t.point_id = p.id
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        GROUP BY t.point_id, t.gold_type_id, t.type
+    `;
+    db.all(sql, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        // Process data
+        const stock = {};
+        rows.forEach(r => {
+            const p = r.point_name || 'Desconhecido';
+            const g = r.gold_type_name || 'Geral';
+            if (!stock[p]) stock[p] = {};
+            if (!stock[p][g]) stock[p][g] = 0;
+
+            if (r.type === 'BUY') stock[p][g] += r.total_weight;
+            if (r.type === 'SELL') stock[p][g] -= r.total_weight;
+        });
+
+        res.json(stock);
     });
 });
 
