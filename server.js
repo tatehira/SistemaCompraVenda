@@ -146,7 +146,7 @@ app.post('/api/gold-types', (req, res) => {
     // Check duplicate for this user
     db.get("SELECT * FROM gold_types WHERE name = ? AND (user_id = ? OR user_id IS NULL)", [name, user_id], (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (row) return res.status(400).json({ error: 'Categoria já existe' });
+        if (row) return res.status(400).json({ error: 'Produto já existe' });
 
         db.run(`INSERT INTO gold_types (name, user_id) VALUES (?, ?)`, [name, user_id], function (err) {
             if (err) {
@@ -224,16 +224,44 @@ app.get('/api/transactions', (req, res) => {
     });
 });
 
+// --- Custom Units Endpoints ---
+app.get('/api/units', (req, res) => {
+    const userId = req.query.user_id;
+    if (!userId) return res.status(400).json({ error: 'User ID required' });
+    db.all("SELECT * FROM measure_units WHERE user_id = ?", [userId], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+app.post('/api/units', (req, res) => {
+    const { name, symbol, user_id } = req.body;
+    if (!user_id || !name || !symbol) return res.status(400).json({ error: 'Missing fields' });
+    db.run("INSERT INTO measure_units (name, symbol, user_id) VALUES (?, ?, ?)", [name, symbol, user_id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ id: this.lastID, name, symbol });
+    });
+});
+
+app.delete('/api/units/:id', (req, res) => {
+    const { id } = req.params;
+    db.run("DELETE FROM measure_units WHERE id = ?", [id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Deleted' });
+    });
+});
+
+
 // Register Purchase (Buy Gold)
 app.post('/api/buy', upload.single('receipt'), (req, res) => {
-    const { weight_grams, price, date, gold_type_id, customer_name, point_id, user_id } = req.body;
+    const { weight_grams, price, date, gold_type_id, customer_name, point_id, user_id, unit } = req.body;
     const receipt_path = req.file ? req.file.path : null;
     const final_customer = customer_name || 'Fornecedor';
 
     if (!user_id) return res.status(400).json({ error: 'User ID required' });
 
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const params = ['BUY', weight_grams, price, final_customer, receipt_path, date || new Date().toISOString(), gold_type_id, point_id || 1, user_id];
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id, unit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const params = ['BUY', weight_grams, price, final_customer, receipt_path, date || new Date().toISOString(), gold_type_id, point_id || 1, user_id, unit || 'g'];
 
     db.run(sql, params, function (err) {
         if (err) {
@@ -246,12 +274,12 @@ app.post('/api/buy', upload.single('receipt'), (req, res) => {
 
 // Register Sale (Sell)
 app.post('/api/sell', upload.single('receipt'), (req, res) => {
-    const { weight_grams, price, customer_name, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id, user_id } = req.body;
+    const { weight_grams, price, customer_name, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id, user_id, unit } = req.body;
     const receipt_path = req.file ? req.file.path : null;
 
     if (!user_id) return res.status(400).json({ error: 'User ID required' });
 
-    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, delivery_courier, delivery_cost, delivery_time, point_id, courier_id, user_id, unit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const params = [
         'SELL',
         weight_grams,
@@ -265,7 +293,8 @@ app.post('/api/sell', upload.single('receipt'), (req, res) => {
         delivery_time || null,
         point_id || 1,
         courier_id || null,
-        user_id
+        user_id,
+        unit || 'g'
     ];
 
     db.run(sql, params, function (err) {
@@ -336,14 +365,15 @@ app.get('/api/stock-details', (req, res) => {
     const userId = req.query.user_id;
     if (!userId) return res.status(400).json({ error: 'User ID required' });
 
-    // Get stock grouped by Point and Gold Type
+    // Get stock grouped by Point, Gold Type AND UNIT
+    // We fetch unit from transactions.
     const sql = `
-        SELECT p.name as point_name, gt.name as gold_type_name, t.type, SUM(t.weight_grams) as total_weight
+        SELECT p.name as point_name, gt.name as gold_type_name, t.type, t.unit, SUM(t.weight_grams) as total_weight
         FROM transactions t
         LEFT JOIN points p ON t.point_id = p.id
         LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
         WHERE t.user_id = ?
-        GROUP BY t.point_id, t.gold_type_id, t.type
+        GROUP BY t.point_id, t.gold_type_id, t.unit, t.type
     `;
     db.all(sql, [userId], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -353,11 +383,23 @@ app.get('/api/stock-details', (req, res) => {
         rows.forEach(r => {
             const p = r.point_name || 'Desconhecido';
             const g = r.gold_type_name || 'Geral';
-            if (!stock[p]) stock[p] = {};
-            if (!stock[p][g]) stock[p][g] = 0;
+            const u = r.unit || 'g'; // Default to g
 
-            if (r.type === 'BUY') stock[p][g] += r.total_weight;
-            if (r.type === 'SELL') stock[p][g] -= r.total_weight;
+            // Structure: Point -> { GoldName: { Unit: Qty } } ?
+            // User view expects Point -> GoldName -> Str(Qty + Unit) ?
+            // Currently view is Point -> GoldName -> Qty.
+            // If we have same GoldName with multiple Units, we should concatenate or split.
+            // Let's use string "Gold 18k (g)" and "Gold 18k (kg)" as keys?
+            // Or change FE to handle map?
+            // Simplest for now: "GoldName (Unit)"
+
+            const key = `${g} (${u})`;
+
+            if (!stock[p]) stock[p] = {};
+            if (!stock[p][key]) stock[p][key] = 0;
+
+            if (r.type === 'BUY') stock[p][key] += r.total_weight;
+            if (r.type === 'SELL') stock[p][key] -= r.total_weight;
         });
 
         res.json(stock);

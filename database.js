@@ -49,7 +49,16 @@ function initializeSchema() {
             FOREIGN KEY(user_id) REFERENCES users(id)
         )`);
 
-        // Transactions Table (Updated)
+        // Measure Units Table
+        db.run(`CREATE TABLE IF NOT EXISTS measure_units (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            user_id INTEGER,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )`);
+
+        // Transactions Table (Updated with unit)
         db.run(`CREATE TABLE IF NOT EXISTS transactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             type TEXT NOT NULL, 
@@ -65,6 +74,7 @@ function initializeSchema() {
             delivery_cost REAL,
             delivery_time TEXT,
             user_id INTEGER,
+            unit TEXT,
             FOREIGN KEY(gold_type_id) REFERENCES gold_types(id),
             FOREIGN KEY(point_id) REFERENCES points(id),
             FOREIGN KEY(courier_id) REFERENCES couriers(id),
@@ -80,9 +90,11 @@ function initializeSchema() {
             { table: 'transactions', name: 'delivery_cost', type: 'REAL' },
             { table: 'transactions', name: 'delivery_time', type: 'TEXT' },
             { table: 'transactions', name: 'user_id', type: 'INTEGER' },
+            { table: 'transactions', name: 'unit', type: 'TEXT' },
             { table: 'points', name: 'user_id', type: 'INTEGER' },
             { table: 'couriers', name: 'user_id', type: 'INTEGER' },
-            { table: 'gold_types', name: 'user_id', type: 'INTEGER' }
+            { table: 'gold_types', name: 'user_id', type: 'INTEGER' },
+            { table: 'measure_units', name: 'user_id', type: 'INTEGER' }
         ];
 
         columnsToAdd.forEach(col => {
@@ -135,19 +147,22 @@ function initializeSchema() {
             }
         });
 
-        // Seed default user if not exists
-        db.get("SELECT count(*) as count FROM users", (err, row) => {
-            if (!err && row.count === 0) {
-                // Default: admin / admin123 (In production use bcrypt!)
-                db.run("INSERT INTO users (username, password) VALUES ('admin', 'admin123')");
-            }
-        });
-
-        // Seed default point if not exists
-        db.get("SELECT count(*) as count FROM points", (err, row) => {
-            if (!err && row.count === 0) {
-                db.run("INSERT INTO points (name, address) VALUES ('Loja Principal', 'Centro')");
-            }
+        // Seed Defaults
+        db.serialize(() => {
+            db.get("SELECT count(*) as count FROM users", (err, row) => {
+                if (!err && row.count === 0) {
+                    // Default: admin / admin123 (In production use bcrypt!)
+                    db.run("INSERT INTO users (username, password) VALUES ('admin', 'admin123')");
+                }
+            });
+            db.get("SELECT count(*) as count FROM points", (err, row) => {
+                if (!err && row.count === 0) {
+                    db.run("INSERT INTO points (name, address) VALUES ('Loja Principal', 'Centro')");
+                }
+            });
+            // Seed Check: We don't verify if units exist because they are per-user in theory, or system wide?
+            // Let's not auto-seed units to avoid clutter if user want empty. Or maybe seed 'g' and 'kg' for NULL user?
+            // Better: Allow user to create them.
         });
     });
 }

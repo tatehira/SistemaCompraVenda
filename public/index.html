@@ -42,13 +42,13 @@
                     📊 Painel Geral
                 </button>
                 <button class="nav-btn" onclick="switchTab('entries')">
-                    📥 Entradas
+                    📥 Entrada no estoque
                 </button>
                 <button class="nav-btn" onclick="switchTab('stock')">
                     📦 Estoque Detalhado
                 </button>
                 <button class="nav-btn" onclick="switchTab('exits')">
-                    📤 Saídas
+                    📤 Vendas
                 </button>
                 <button class="nav-btn" onclick="switchTab('history')">
                     📜 Histórico
@@ -104,19 +104,19 @@
             <!-- VIEW: ENTRIES (COMPRAS) -->
             <div id="view-entries" class="view-section">
                 <header>
-                    <h1>Entradas</h1>
+                    <h1>Entrada no estoque</h1>
                     <p class="subtitle">Registrar compra de mercadoria</p>
                 </header>
 
                 <div class="card" style="max-width: 800px; margin: 0 auto;">
-                    <div class="section-title">Formulário de Entrada</div>
+                    <div class="section-title">Formulário de Entrada no estoque</div>
                     <form id="buy-form">
                         <div class="form-group">
                             <label>Loja / Ponto</label>
                             <select name="point_id" class="point-select" required></select>
                         </div>
                         <div class="form-group">
-                            <label>Categoria / Produto</label>
+                            <label>Produto / Produto</label>
                             <select name="gold_type" required class="gold-type-select">
                                 <!-- Filled by JS -->
                             </select>
@@ -141,7 +141,7 @@
                             <label>Fornecedor (Opcional)</label>
                             <input type="text" name="customer" placeholder="Nome do Fornecedor">
                         </div>
-                        <button type="submit" class="btn btn-primary">Registrar Entrada</button>
+                        <button type="submit" class="btn btn-primary">Registrar Entrada no estoque</button>
                     </form>
                 </div>
             </div>
@@ -149,19 +149,19 @@
             <!-- VIEW: EXITS (VENDAS) -->
             <div id="view-exits" class="view-section">
                 <header>
-                    <h1>Saídas</h1>
+                    <h1>Vendas</h1>
                     <p class="subtitle">Registrar venda de mercadoria</p>
                 </header>
 
                 <div class="card" style="max-width: 800px; margin: 0 auto;">
-                    <div class="section-title">Formulário de Saída</div>
+                    <div class="section-title">Formulário de Venda</div>
                     <form id="sell-form">
                         <div class="form-group">
                             <label>Loja / Ponto</label>
                             <select name="point_id" class="point-select" required></select>
                         </div>
                         <div class="form-group">
-                            <label>Categoria / Produto</label>
+                            <label>Produto / Produto</label>
                             <select name="gold_type" required class="gold-type-select">
                                 <!-- Filled by JS -->
                             </select>
@@ -219,7 +219,7 @@
                             <label>Data</label>
                             <input type="date" name="date" required>
                         </div>
-                        <button type="submit" class="btn btn-danger">Registrar Saída</button>
+                        <button type="submit" class="btn btn-danger">Registrar Venda</button>
                     </form>
                 </div>
             </div>
@@ -257,15 +257,15 @@
             <div id="view-actions" class="view-section">
                 <header>
                     <h1>Gerenciamento</h1>
-                    <p class="subtitle">Categorias, Pontos e Entregadores</p>
+                    <p class="subtitle">Produtos, Pontos e Entregadores</p>
                 </header>
 
                 <div class="forms-grid">
                     <!-- Categories -->
                     <div class="card">
-                        <div class="section-title">Categorias</div>
+                        <div class="section-title">Produtos</div>
                         <button id="btn-add-type" class="btn btn-primary" style="margin-bottom: 1rem">+ Nova
-                            Categoria</button>
+                            Produto</button>
                         <button id="btn-adjust-stock" class="btn" style="background: var(--text-secondary);">Ajuste
                             Manual</button>
                     </div>
@@ -303,6 +303,22 @@
                         </form>
                         <ul id="couriers-list"
                             style="margin-top: 1rem; color: var(--text-secondary); padding-left: 1rem;"></ul>
+                    </div>
+
+                    <!-- Custom Units -->
+                    <div class="card">
+                        <div class="section-title">Unidades de Medida</div>
+                        <form id="unit-form">
+                            <div class="form-group">
+                                <input type="text" name="name" placeholder="Nome (Ex: Metro, Litro)" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="symbol" placeholder="Símbolo (Ex: m, L)" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Adicionar Unidade</button>
+                        </form>
+                        <ul id="units-list" style="margin-top: 1rem; color: var(--text-secondary); padding-left: 1rem;">
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -398,10 +414,10 @@
     <div id="type-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-modal" id="close-type">&times;</span>
-            <h2>Nova Categoria</h2>
+            <h2>Novo Produto</h2>
             <form id="type-form" style="margin-top: 1.5rem;">
                 <div class="form-group">
-                    <label>Nome da Categoria</label>
+                    <label>Nome da Produto</label>
                     <input type="text" name="type_name" placeholder="Ex: Bebidas, Eletronicos..." required>
                 </div>
                 <button type="submit" class="btn btn-primary">Salvar</button>
@@ -424,7 +440,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Categoria</label>
+                    <label>Produto</label>
                     <select name="gold_type_id" required class="gold-type-select">
                         <!-- Filled by JS -->
                     </select>
@@ -475,7 +491,7 @@
                 negativos para remover.</p>
             <form id="adjust-form">
                 <div class="form-group">
-                    <label>Categoria</label>
+                    <label>Produto</label>
                     <select name="gold_type_id" required class="gold-type-select"></select>
                 </div>
                 <div class="form-group">
@@ -502,7 +518,7 @@
                     <input type="text" name="username" required>
                 </div>
                 <div class="form-group">
-                    <label>Nova Senha (opcional)</label>
+                    <label>Novo Senha (opcional)</label>
                     <input type="password" name="new_password">
                 </div>
                 <div class="form-group">

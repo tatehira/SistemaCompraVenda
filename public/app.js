@@ -153,6 +153,7 @@ function loadApp() {
         fetchGoldTypes().catch(e => console.error(e));
         fetchPoints().catch(e => console.error(e));
         fetchCouriers().catch(e => console.error(e));
+        fetchUnits().catch(e => console.error(e));
         updateStats().catch(e => console.error(e));
         updateTransactions().catch(e => console.error(e));
         loadChart().catch(e => console.error(e));
@@ -212,6 +213,52 @@ async function fetchCouriers() {
     } catch (e) { console.error(e); }
 }
 
+async function fetchUnits() {
+    try {
+        const userId = getUserId();
+        if (!userId) return;
+        const res = await fetch(`${API_URL}/units?user_id=${userId}`);
+        const units = await res.json();
+
+        // Populate Management List
+        const list = document.getElementById('units-list');
+        if (list) {
+            list.innerHTML = units.map(u => `<li>${u.name} (${u.symbol}) 
+                <button onclick="deleteUnit(${u.id})" style="background:none; border:none; color:red; cursor:pointer;">X</button>
+            </li>`).join('');
+        }
+
+        // Populate Form Selects
+        // We find all selects named 'unit' and populate them
+        const unitSelects = document.querySelectorAll('select[name="unit"]');
+        unitSelects.forEach(sel => {
+            const current = sel.value;
+            // Always include default g/kg? Or only if user hasn't deleted them?
+            // User requested "Register unit... use it".
+            // Assuming we only show registered units + maybe defaults if we seeded.
+            // But we didn't seed. So we rely on user adding them.
+            // Fallback: If list empty, show g/kg statically?
+            // Better: Add defaults to list if empty?
+
+            if (units.length === 0) {
+                // Fallback options
+                sel.innerHTML = `<option value="g">Gramas (g)</option><option value="kg">Quilos (kg)</option>`;
+            } else {
+                sel.innerHTML = units.map(u => `<option value="${u.symbol}">${u.name} (${u.symbol})</option>`).join('');
+                // Also maybe allow g/kg hardcoded if desired?
+            }
+            if (current && Array.from(sel.options).some(o => o.value === current)) sel.value = current;
+        });
+
+    } catch (e) { console.error(e); }
+}
+
+async function deleteUnit(id) {
+    if (!confirm('Deletar unidade?')) return;
+    await fetch(`${API_URL}/units/${id}`, { method: 'DELETE' });
+    fetchUnits();
+}
+
 async function fetchStockDetails() {
     const container = document.getElementById('stock-details-container');
     if (!container) return;
@@ -237,12 +284,12 @@ async function fetchStockDetails() {
                         <h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">📍 ${point}</h3>
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">`;
 
-            for (const [gold, quantity] of Object.entries(goldMap)) {
-                html += `<div onclick="openStockHistory('${point}', '${gold}')" 
+            for (const [goldKey, quantity] of Object.entries(goldMap)) {
+                html += `<div onclick="openStockHistory('${point}', '${goldKey}')" 
                               style="background: rgba(15, 23, 42, 0.8); padding: 1rem; border-radius: 8px; text-align: center; cursor: pointer; transition: transform 0.2s;"
                               onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                            <div style="font-size: 0.9rem; color: var(--text-secondary);">${gold}</div>
-                            <div style="font-size: 1.2rem; font-weight: bold;">${quantity.toFixed(2)} g</div>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);">${goldKey}</div>
+                            <div style="font-size: 1.2rem; font-weight: bold;">${quantity.toFixed(2)}</div>
                          </div>`;
             }
             html += `</div></div>`;
@@ -254,41 +301,40 @@ async function fetchStockDetails() {
 }
 
 // --- STOCK HISTORY (New) ---
-async function openStockHistory(pointName, goldName) {
+async function openStockHistory(pointName, compositeKey) {
+    // compositeKey = "Name (Unit)"
+    // We need to extract them to filter.
+    // Ideally we shouldn't pass strings but IDs.
+    // Hacky parse:
+    const match = compositeKey.match(/^(.*) \((.*)\)$/);
+    const goldName = match ? match[1] : compositeKey;
+    const unitSymbol = match ? match[2] : '';
+
     const modal = document.getElementById('stock-item-modal');
     const title = document.getElementById('stock-item-title');
     const content = document.getElementById('stock-item-history');
 
     modal.style.display = 'flex';
-    title.innerText = `${goldName} em ${pointName}`;
+    title.innerText = `${goldName} ${unitSymbol ? '(' + unitSymbol + ')' : ''} em ${pointName}`;
     content.innerHTML = '<p>Carregando histórico...</p>';
 
     try {
         const userId = getUserId();
         const res = await fetch(`${API_URL}/transactions?user_id=${userId}`);
-        const allTxs = await res.json(); // Not efficient for large data, but works for now.
-
-        // Filter by Point Name and Gold Name (Not IDs? server returns names joined)
-        // Check filtering logic.
-        // Transactions endpoint returns: point_id (int), gold_type_id (int).
-        // AND it joins gold_type_name. BUT it does NOT join point_name by default in the list endpoint?
-        // Let's check server.js... /api/transactions only joins gold_types. Point is ID.
-        // Problem: Point Name in stock-details comes from a join.
-        // I need to match Point Name. Or better, fix stock-details to return IDs too.
-
-        // Quick fix: Client side match is risky if names change.
-        // Let's matching by ID is better. But I don't have IDs in the loop above easily unless I change backend.
-        // Let's fetch Points to match ID.
+        const allTxs = await res.json();
 
         const pointsRes = await fetch(`${API_URL}/points?user_id=${userId}`);
         const points = await pointsRes.json();
         const pointObj = points.find(p => p.name === pointName);
 
         const filtered = allTxs.filter(tx => {
+            const txUnit = tx.unit || 'g'; // default
             return (tx.gold_type_name === goldName) &&
-                (pointObj ? tx.point_id === pointObj.id : true);
+                (pointObj ? tx.point_id === pointObj.id : true) &&
+                (txUnit === unitSymbol);
         });
 
+        // ... Render Table (same as before) ...
         if (filtered.length === 0) {
             content.innerHTML = '<p>Nenhuma movimentação encontrada.</p>';
             return;
@@ -297,14 +343,15 @@ async function openStockHistory(pointName, goldName) {
         content.innerHTML = `
             <table style="width:100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem;">
                 <thead style="background: rgba(255,255,255,0.1);">
-                    <tr><th>Data</th><th>Tipo</th><th>Qtd</th><th>Valor</th><th>Cliente</th></tr>
+                    <tr><th>Data</th><th>Tipo</th><th>Qtd</th><th>Unit</th><th>Valor</th><th>Cliente</th></tr>
                 </thead>
                 <tbody>
                     ${filtered.map(tx => `
                         <tr>
                             <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${formatDate(tx.date)}</td>
-                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: ${tx.type === 'BUY' ? 'var(--success-color)' : 'var(--danger-color)'}">${tx.type === 'BUY' ? 'ENTRADA' : 'SAÍDA'}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: ${tx.type === 'BUY' ? 'var(--success-color)' : 'var(--danger-color)'}">${tx.type === 'BUY' ? 'Entrada no estoque' : 'Venda'}</td>
                             <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${tx.weight_grams}</td>
+                            <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${tx.unit || 'g'}</td>
                             <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${formatCurrency(tx.price)}</td>
                             <td style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">${tx.customer_name || '-'}</td>
                         </tr>
@@ -312,10 +359,8 @@ async function openStockHistory(pointName, goldName) {
                 </tbody>
             </table>
         `;
-    } catch (e) {
-        console.error(e);
-        content.innerHTML = '<p style="color:red">Erro ao carregar detalhes.</p>';
-    }
+
+    } catch (e) { console.error(e); }
 }
 
 function setupEventListeners() {
@@ -411,7 +456,7 @@ function setupEventListeners() {
     document.getElementById('type-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         submitForm(`${API_URL}/gold-types`, { name: e.target.type_name.value, user_id: getUserId() }, () => {
-            showToast('Categoria adicionada!', 'success');
+            showToast('Produto adicionada!', 'success');
             modal.style.display = 'none';
             e.target.reset();
             fetchGoldTypes();
@@ -447,6 +492,19 @@ function setupEventListeners() {
         });
     });
 
+    document.getElementById('unit-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        submitForm(`${API_URL}/units`, {
+            name: e.target.name.value,
+            symbol: e.target.symbol.value,
+            user_id: getUserId()
+        }, () => {
+            showToast('Unidade adicionada!', 'success');
+            e.target.reset();
+            fetchUnits();
+        });
+    });
+
     document.getElementById('adjust-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -475,7 +533,7 @@ function setupEventListeners() {
         fetch(`${API_URL}/buy`, { method: 'POST', body: payload })
             .then(res => {
                 if (res.ok) {
-                    showToast('Entrada registrada!', 'success');
+                    showToast('Entrada no estoque registrada!', 'success');
                     e.target.reset();
                     updateStats();
                     updateTransactions();
@@ -498,6 +556,7 @@ function setupEventListeners() {
         payload.append('customer_name', formData.get('customer'));
         payload.append('date', formData.get('date'));
         payload.append('user_id', getUserId());
+        payload.append('unit', formData.get('unit')); // Add Unit
 
         if (document.getElementById('delivery-check').checked) {
             const courierId = formData.get('courier_id');
@@ -516,7 +575,7 @@ function setupEventListeners() {
         fetch(`${API_URL}/sell`, { method: 'POST', body: payload })
             .then(res => {
                 if (res.ok) {
-                    showToast('Saída registrada!', 'success');
+                    showToast('Venda registrada!', 'success');
                     e.target.reset();
                     document.getElementById('delivery-fields').style.display = 'none';
                     updateStats();
@@ -562,12 +621,9 @@ async function submitForm(url, data, onSuccess) {
     } catch (e) { showToast('Erro de conexão', 'error'); }
 }
 
+// Simplified: No auto-conversion. Value is Value. Unit is Unit.
 function getWeightInGrams(form) {
-    let weight = parseFloat(form.weight.value);
-    const unit = form.unit.value; // Now this comes from the select, which defaults to pref
-    if (unit === 'kg') weight *= 1000;
-    // if unit is 'g', weight is weight.
-    return weight;
+    return parseFloat(form.weight.value);
 }
 
 function applyUserPreferences() {
@@ -671,7 +727,7 @@ async function updateTransactions() {
             const isBuy = tx.type === 'BUY';
             const badge = tx.customer_name?.includes('AJUSTE')
                 ? '<span class="badge" style="background:#64748b; color:#fff">AJUSTE</span>'
-                : (isBuy ? '<span class="badge badge-buy">ENTRADA</span>' : '<span class="badge badge-sell">SAÍDA</span>');
+                : (isBuy ? '<span class="badge badge-buy">Entrada no estoque</span>' : '<span class="badge badge-sell">Venda</span>');
 
             return `
                 <tr>
@@ -705,7 +761,7 @@ async function loadChart() {
                 labels: data.labels,
                 datasets: [
                     { label: 'Vendas', data: data.soldData, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true },
-                    { label: 'Entradas', data: data.boughtData, borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true }
+                    { label: 'Entrada no estoques no estoque', data: data.boughtData, borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true }
                 ]
             },
             options: { responsive: true, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
@@ -725,19 +781,19 @@ function generatePrintableReport(transactions, start, end) {
     </head>
     <body>
         <h1>Relatório de Movimentação (${formatDate(start)} - ${formatDate(end)})</h1>
-        <h2>Entradas</h2>
+        <h2>Entrada no estoques no estoque</h2>
         <table>
             <thead><tr><th>Data</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Fornecedor</th></tr></thead>
             <tbody>${buying.map(tx => `<tr><td>${formatDate(tx.date)}</td><td>${tx.gold_type_name}</td><td>${tx.weight_grams}</td><td>${formatCurrency(tx.price)}</td><td>${tx.customer_name}</td></tr>`).join('')}</tbody>
         </table>
-        <div class="total">Total Entradas: ${formatCurrency(buying.reduce((a, t) => a + t.price, 0))}</div>
+        <div class="total">Total Entrada no estoques no estoque: ${formatCurrency(buying.reduce((a, t) => a + t.price, 0))}</div>
 
-        <h2>Saídas</h2>
+        <h2>Vendas</h2>
         <table>
             <thead><tr><th>Data</th><th>Item</th><th>Qtd</th><th>Valor</th><th>Cliente</th></tr></thead>
             <tbody>${selling.map(tx => `<tr><td>${formatDate(tx.date)}</td><td>${tx.gold_type_name}</td><td>${tx.weight_grams}</td><td>${formatCurrency(tx.price)}</td><td>${tx.customer_name}</td></tr>`).join('')}</tbody>
         </table>
-        <div class="total">Total Saídas: ${formatCurrency(selling.reduce((a, t) => a + t.price, 0))}</div>
+        <div class="total">Total Vendas: ${formatCurrency(selling.reduce((a, t) => a + t.price, 0))}</div>
         
         <br>
         <strong>Lucro Bruto: ${formatCurrency(selling.reduce((a, t) => a + t.price, 0) - buying.reduce((a, t) => a + t.price, 0))}</strong>
