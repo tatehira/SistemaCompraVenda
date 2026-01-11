@@ -15,7 +15,13 @@
           "filename": "src/actions/auth.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getSession",
+          "filename": "src/actions/auth.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "getSession",
           "filename": "src/actions/auth.ts"
@@ -43,6 +49,7 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/settings/page": "rsc",
         "app/dashboard/transactions/page": "rsc"
@@ -65,7 +72,13 @@
           "filename": "src/actions/auth.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "logout",
+          "filename": "src/actions/auth.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "logout",
           "filename": "src/actions/auth.ts"
@@ -93,6 +106,7 @@
         "app/dashboard/buy/page": "action-browser",
         "app/dashboard/inventory/page": "action-browser",
         "app/dashboard/page": "action-browser",
+        "app/dashboard/reports/page": "action-browser",
         "app/dashboard/sell/page": "action-browser",
         "app/dashboard/settings/page": "action-browser",
         "app/dashboard/transactions/page": "action-browser"
@@ -115,7 +129,13 @@
           "filename": "src/actions/auth.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "register",
+          "filename": "src/actions/auth.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "register",
           "filename": "src/actions/auth.ts"
@@ -149,6 +169,7 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/settings/page": "rsc",
         "app/dashboard/transactions/page": "rsc",
@@ -172,7 +193,13 @@
           "filename": "src/actions/auth.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "login",
+          "filename": "src/actions/auth.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "login",
           "filename": "src/actions/auth.ts"
@@ -206,6 +233,7 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/settings/page": "rsc",
         "app/dashboard/transactions/page": "rsc",
@@ -213,6 +241,56 @@
       },
       "filename": "src/actions/auth.ts",
       "exportedName": "login"
+    },
+    "002b6512083828ceae5a051006e3a227e34d293b12": {
+      "workers": {
+        "app/dashboard/buy/page": {
+          "moduleId": 41896,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/inventory/page": {
+          "moduleId": 74622,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/buy/page": "rsc",
+        "app/dashboard/inventory/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "filename": "src/actions/transactions.ts",
+      "exportedName": "getCustomers"
     },
     "003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56": {
       "workers": {
@@ -229,7 +307,13 @@
           "filename": "src/actions/transactions.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getInventory",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "getInventory",
           "filename": "src/actions/transactions.ts"
@@ -251,6 +335,7 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/transactions/page": "rsc"
       },
@@ -272,7 +357,13 @@
           "filename": "src/actions/transactions.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getTransactions",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "getTransactions",
           "filename": "src/actions/transactions.ts"
@@ -294,6 +385,7 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/transactions/page": "rsc"
       },
@@ -315,7 +407,13 @@
           "filename": "src/actions/transactions.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getDailySales",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "getDailySales",
           "filename": "src/actions/transactions.ts"
@@ -337,6 +435,7 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/transactions/page": "rsc"
       },
@@ -358,7 +457,13 @@
           "filename": "src/actions/transactions.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "buy",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "buy",
           "filename": "src/actions/transactions.ts"
@@ -380,6 +485,7 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/transactions/page": "rsc"
       },
@@ -401,7 +507,13 @@
           "filename": "src/actions/transactions.ts"
         },
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "sell",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
           "async": false,
           "exportedName": "sell",
           "filename": "src/actions/transactions.ts"
@@ -423,11 +535,234 @@
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/inventory/page": "rsc",
         "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
         "app/dashboard/sell/page": "rsc",
         "app/dashboard/transactions/page": "rsc"
       },
       "filename": "src/actions/transactions.ts",
       "exportedName": "sell"
+    },
+    "7882091f6bdb971a029c4d6ef49e1a7ea0e486c1d8": {
+      "workers": {
+        "app/dashboard/buy/page": {
+          "moduleId": 41896,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/inventory/page": {
+          "moduleId": 74622,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        },
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/buy/page": "rsc",
+        "app/dashboard/inventory/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "filename": "src/actions/transactions.ts",
+      "exportedName": "getReports"
+    },
+    "00e044cb070627323741c2b21cf1874bb233a689c9": {
+      "workers": {
+        "app/dashboard/buy/page": {
+          "moduleId": 41896,
+          "async": false,
+          "exportedName": "getPoints",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getPoints",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
+          "async": false,
+          "exportedName": "getPoints",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "getPoints",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 50383,
+          "async": false,
+          "exportedName": "getPoints",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/buy/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "filename": "src/actions/points.ts",
+      "exportedName": "getPoints"
+    },
+    "40d5b5eb154185734c920d8afd833e43f6fb5ec707": {
+      "workers": {
+        "app/dashboard/buy/page": {
+          "moduleId": 41896,
+          "async": false,
+          "exportedName": "deletePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "deletePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
+          "async": false,
+          "exportedName": "deletePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "deletePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 50383,
+          "async": false,
+          "exportedName": "deletePoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/buy/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "filename": "src/actions/points.ts",
+      "exportedName": "deletePoint"
+    },
+    "7023aa85bea6dbf7589e36d0a1dce745f3bc64eb99": {
+      "workers": {
+        "app/dashboard/buy/page": {
+          "moduleId": 41896,
+          "async": false,
+          "exportedName": "addPoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "addPoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
+          "async": false,
+          "exportedName": "addPoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "addPoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 50383,
+          "async": false,
+          "exportedName": "addPoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/buy/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "filename": "src/actions/points.ts",
+      "exportedName": "addPoint"
+    },
+    "70c615d73cd81ec259c2e3faefaa2410d1784ed628": {
+      "workers": {
+        "app/dashboard/buy/page": {
+          "moduleId": 41896,
+          "async": false,
+          "exportedName": "updatePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "updatePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/reports/page": {
+          "moduleId": 20017,
+          "async": false,
+          "exportedName": "updatePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "updatePoint",
+          "filename": "src/actions/points.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 50383,
+          "async": false,
+          "exportedName": "updatePoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/buy/page": "rsc",
+        "app/dashboard/page": "rsc",
+        "app/dashboard/reports/page": "rsc",
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "filename": "src/actions/points.ts",
+      "exportedName": "updatePoint"
     },
     "4045419a092b432464ba9db3314fe031cc52fcd181": {
       "workers": {
@@ -468,7 +803,7 @@
       "layer": {
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "rsc"
+        "app/dashboard/settings/page": "action-browser"
       },
       "filename": "src/actions/gold.ts",
       "exportedName": "getUnits"
@@ -497,7 +832,7 @@
       "layer": {
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "rsc"
+        "app/dashboard/settings/page": "action-browser"
       },
       "filename": "src/actions/gold.ts",
       "exportedName": "getGoldTypes"
@@ -560,6 +895,35 @@
       "filename": "src/actions/gold.ts",
       "exportedName": "addGoldType"
     },
+    "60929447a09582f3bd440e9a83d68e2434259e5d77": {
+      "workers": {
+        "app/dashboard/buy/page": {
+          "moduleId": 41896,
+          "async": false,
+          "exportedName": "updateGoldType",
+          "filename": "src/actions/gold.ts"
+        },
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "updateGoldType",
+          "filename": "src/actions/gold.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 50383,
+          "async": false,
+          "exportedName": "updateGoldType",
+          "filename": "src/actions/gold.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/buy/page": "rsc",
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "filename": "src/actions/gold.ts",
+      "exportedName": "updateGoldType"
+    },
     "70976d5adb8cfd00ee45690b73af91aee0d7cd2c82": {
       "workers": {
         "app/dashboard/buy/page": {
@@ -584,97 +948,10 @@
       "layer": {
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "rsc"
+        "app/dashboard/settings/page": "action-browser"
       },
       "filename": "src/actions/gold.ts",
       "exportedName": "addUnit"
-    },
-    "00e044cb070627323741c2b21cf1874bb233a689c9": {
-      "workers": {
-        "app/dashboard/buy/page": {
-          "moduleId": 41896,
-          "async": false,
-          "exportedName": "getPoints",
-          "filename": "src/actions/points.ts"
-        },
-        "app/dashboard/sell/page": {
-          "moduleId": 73188,
-          "async": false,
-          "exportedName": "getPoints",
-          "filename": "src/actions/points.ts"
-        },
-        "app/dashboard/settings/page": {
-          "moduleId": 50383,
-          "async": false,
-          "exportedName": "getPoints",
-          "filename": "src/actions/points.ts"
-        }
-      },
-      "layer": {
-        "app/dashboard/buy/page": "rsc",
-        "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "rsc"
-      },
-      "filename": "src/actions/points.ts",
-      "exportedName": "getPoints"
-    },
-    "40d5b5eb154185734c920d8afd833e43f6fb5ec707": {
-      "workers": {
-        "app/dashboard/buy/page": {
-          "moduleId": 41896,
-          "async": false,
-          "exportedName": "deletePoint",
-          "filename": "src/actions/points.ts"
-        },
-        "app/dashboard/sell/page": {
-          "moduleId": 73188,
-          "async": false,
-          "exportedName": "deletePoint",
-          "filename": "src/actions/points.ts"
-        },
-        "app/dashboard/settings/page": {
-          "moduleId": 50383,
-          "async": false,
-          "exportedName": "deletePoint",
-          "filename": "src/actions/points.ts"
-        }
-      },
-      "layer": {
-        "app/dashboard/buy/page": "rsc",
-        "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "action-browser"
-      },
-      "filename": "src/actions/points.ts",
-      "exportedName": "deletePoint"
-    },
-    "7023aa85bea6dbf7589e36d0a1dce745f3bc64eb99": {
-      "workers": {
-        "app/dashboard/buy/page": {
-          "moduleId": 41896,
-          "async": false,
-          "exportedName": "addPoint",
-          "filename": "src/actions/points.ts"
-        },
-        "app/dashboard/sell/page": {
-          "moduleId": 73188,
-          "async": false,
-          "exportedName": "addPoint",
-          "filename": "src/actions/points.ts"
-        },
-        "app/dashboard/settings/page": {
-          "moduleId": 50383,
-          "async": false,
-          "exportedName": "addPoint",
-          "filename": "src/actions/points.ts"
-        }
-      },
-      "layer": {
-        "app/dashboard/buy/page": "rsc",
-        "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "action-browser"
-      },
-      "filename": "src/actions/points.ts",
-      "exportedName": "addPoint"
     },
     "40fd12db1fd354dd74c593901a6b4e02d6d40de285": {
       "workers": {
@@ -708,7 +985,7 @@
       },
       "layer": {
         "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "rsc"
+        "app/dashboard/settings/page": "action-browser"
       },
       "filename": "src/actions/couriers.ts",
       "exportedName": "getCouriers"
@@ -756,6 +1033,28 @@
       },
       "filename": "src/actions/couriers.ts",
       "exportedName": "addCourier"
+    },
+    "78c03efd9d1fd9f8794ad80c4fa46144b2f8e59832": {
+      "workers": {
+        "app/dashboard/sell/page": {
+          "moduleId": 73188,
+          "async": false,
+          "exportedName": "updateCourier",
+          "filename": "src/actions/couriers.ts"
+        },
+        "app/dashboard/settings/page": {
+          "moduleId": 50383,
+          "async": false,
+          "exportedName": "updateCourier",
+          "filename": "src/actions/couriers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/sell/page": "rsc",
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "filename": "src/actions/couriers.ts",
+      "exportedName": "updateCourier"
     }
   },
   "edge": {},

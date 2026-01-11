@@ -4,10 +4,11 @@
   "/dashboard/buy/page": "app/dashboard/buy/page.js",
   "/dashboard/inventory/page": "app/dashboard/inventory/page.js",
   "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/reports/page": "app/dashboard/reports/page.js",
   "/dashboard/sell/page": "app/dashboard/sell/page.js",
   "/dashboard/settings/page": "app/dashboard/settings/page.js",
   "/dashboard/transactions/page": "app/dashboard/transactions/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/icon.png/route": "app/icon.png/route.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js"
 }

@@ -11,7 +11,7 @@ const navItems = [
     { href: '/dashboard/sell', label: 'Vender', icon: DollarSign },
     { href: '/dashboard/inventory', label: 'Estoque', icon: Package },
     { href: '/dashboard/transactions', label: 'Histórico', icon: History },
-    { href: '/dashboard/reports', label: 'Relatórios', icon: FileText },
+
     { href: '/dashboard/settings', label: 'Configurações', icon: Settings },
 ]
 

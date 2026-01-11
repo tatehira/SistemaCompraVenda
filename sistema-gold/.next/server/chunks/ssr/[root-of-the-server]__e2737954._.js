@@ -24,6 +24,21 @@ module.exports=[24868,(a,b,c)=>{b.exports=a.x("fs/promises",()=>require("fs/prom
         GROUP BY date
         ORDER BY date ASC
         LIMIT 30
-    `).all(b)}(0,a.i(13095).ensureServerEntryExports)([i,j,k,l,m]),(0,b.registerServerReference)(i,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",null),(0,b.registerServerReference)(j,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",null),(0,b.registerServerReference)(k,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",null),(0,b.registerServerReference)(l,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",null),(0,b.registerServerReference)(m,"00f8b6b51ec039725d13a2c470924b629bd2c60752",null),a.s(["buy",()=>i,"getDailySales",()=>m,"getInventory",()=>k,"getTransactions",()=>l,"sell",()=>j])},47567,a=>{"use strict";var b=a.i(63707),c=a.i(32705);a.s([],54163),a.i(54163),a.s(["001cff6da69649cb3538ebb44b85726acfda477617",()=>b.getSession,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",()=>c.getInventory,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",()=>c.getTransactions,"00f5ae00e140bafd8c394ea98ad441ac36c1f2b778",()=>b.logout,"00f8b6b51ec039725d13a2c470924b629bd2c60752",()=>c.getDailySales,"400005926efb722f25cb6dbbee9d650d9ce8a30e42",()=>b.register,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",()=>c.buy,"40b73d41e742e5c9864de0c62d5bd2bf172ed6c6d1",()=>b.login,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",()=>c.sell],47567)}];
+    `).all(b)}async function n(){let a=await (0,g.getSession)();if(!a)return[];let b=Number(a.sub);return c.default.prepare(`
+        SELECT DISTINCT customer_name 
+        FROM transactions 
+        WHERE user_id = ? 
+        AND customer_name IS NOT NULL 
+        AND customer_name != ''
+        ORDER BY customer_name ASC
+    `).all(b).map(a=>a.customer_name)}async function o(a,b,d,e){let f=await (0,g.getSession)();if(!f)return{transactions:[],summary:{totalBuy:0,totalSell:0,balance:0,totalBuyWeight:0,totalSellWeight:0}};let h=Number(f.sub),i=`
+        SELECT t.*, gt.name as gold_name, p.name as point_name
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = ? 
+        AND date(t.date) >= date(?) 
+        AND date(t.date) <= date(?)
+    `,j=[h,a,b];d&&(i+=" AND t.point_id = ?",j.push(d)),e&&(i+=" AND t.customer_name = ?",j.push(e)),i+=" ORDER BY t.date DESC";let k=c.default.prepare(i).all(...j),l=k.reduce((a,b)=>("BUY"===b.type?(a.totalBuy+=b.price,a.totalBuyWeight+=b.weight_grams,a.balance-=b.price):"SELL"===b.type&&(a.totalSell+=b.price,a.totalSellWeight+=b.weight_grams,a.balance+=b.price),a),{totalBuy:0,totalSell:0,balance:0,totalBuyWeight:0,totalSellWeight:0});return{transactions:k,summary:l}}(0,a.i(13095).ensureServerEntryExports)([i,j,k,l,m,n,o]),(0,b.registerServerReference)(i,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",null),(0,b.registerServerReference)(j,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",null),(0,b.registerServerReference)(k,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",null),(0,b.registerServerReference)(l,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",null),(0,b.registerServerReference)(m,"00f8b6b51ec039725d13a2c470924b629bd2c60752",null),(0,b.registerServerReference)(n,"002b6512083828ceae5a051006e3a227e34d293b12",null),(0,b.registerServerReference)(o,"7882091f6bdb971a029c4d6ef49e1a7ea0e486c1d8",null),a.s(["buy",()=>i,"getCustomers",()=>n,"getDailySales",()=>m,"getInventory",()=>k,"getReports",()=>o,"getTransactions",()=>l,"sell",()=>j])},47567,a=>{"use strict";var b=a.i(63707),c=a.i(32705);a.s([],54163),a.i(54163),a.s(["001cff6da69649cb3538ebb44b85726acfda477617",()=>b.getSession,"002b6512083828ceae5a051006e3a227e34d293b12",()=>c.getCustomers,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",()=>c.getInventory,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",()=>c.getTransactions,"00f5ae00e140bafd8c394ea98ad441ac36c1f2b778",()=>b.logout,"00f8b6b51ec039725d13a2c470924b629bd2c60752",()=>c.getDailySales,"400005926efb722f25cb6dbbee9d650d9ce8a30e42",()=>b.register,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",()=>c.buy,"40b73d41e742e5c9864de0c62d5bd2bf172ed6c6d1",()=>b.login,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",()=>c.sell,"7882091f6bdb971a029c4d6ef49e1a7ea0e486c1d8",()=>c.getReports],47567)}];
 
 //# sourceMappingURL=%5Broot-of-the-server%5D__e2737954._.js.map

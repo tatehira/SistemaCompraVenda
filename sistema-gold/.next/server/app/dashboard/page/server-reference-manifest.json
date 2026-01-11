@@ -3,7 +3,7 @@
     "001cff6da69649cb3538ebb44b85726acfda477617": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "getSession",
           "filename": "src/actions/auth.ts"
@@ -18,7 +18,7 @@
     "00f5ae00e140bafd8c394ea98ad441ac36c1f2b778": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "logout",
           "filename": "src/actions/auth.ts"
@@ -33,7 +33,7 @@
     "400005926efb722f25cb6dbbee9d650d9ce8a30e42": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "register",
           "filename": "src/actions/auth.ts"
@@ -48,7 +48,7 @@
     "40b73d41e742e5c9864de0c62d5bd2bf172ed6c6d1": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "login",
           "filename": "src/actions/auth.ts"
@@ -60,10 +60,25 @@
       "exportedName": "login",
       "filename": "src/actions/auth.ts"
     },
+    "002b6512083828ceae5a051006e3a227e34d293b12": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "getCustomers",
+      "filename": "src/actions/transactions.ts"
+    },
     "003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "getInventory",
           "filename": "src/actions/transactions.ts"
@@ -78,7 +93,7 @@
     "00b1aa0a5aabcd51d7e4770e006ea38d2077a06119": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "getTransactions",
           "filename": "src/actions/transactions.ts"
@@ -93,7 +108,7 @@
     "00f8b6b51ec039725d13a2c470924b629bd2c60752": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "getDailySales",
           "filename": "src/actions/transactions.ts"
@@ -108,7 +123,7 @@
     "40a6bd7a98cbdb2610d87168772495a140cc23b2bb": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "buy",
           "filename": "src/actions/transactions.ts"
@@ -123,7 +138,7 @@
     "40f2e801184a8ed1f430e97bac6910394b6cc2bfc2": {
       "workers": {
         "app/dashboard/page": {
-          "moduleId": 27189,
+          "moduleId": 25141,
           "async": false,
           "exportedName": "sell",
           "filename": "src/actions/transactions.ts"
@@ -134,6 +149,81 @@
       },
       "exportedName": "sell",
       "filename": "src/actions/transactions.ts"
+    },
+    "7882091f6bdb971a029c4d6ef49e1a7ea0e486c1d8": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "getReports",
+      "filename": "src/actions/transactions.ts"
+    },
+    "00e044cb070627323741c2b21cf1874bb233a689c9": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "getPoints",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "getPoints",
+      "filename": "src/actions/points.ts"
+    },
+    "40d5b5eb154185734c920d8afd833e43f6fb5ec707": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "deletePoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "deletePoint",
+      "filename": "src/actions/points.ts"
+    },
+    "7023aa85bea6dbf7589e36d0a1dce745f3bc64eb99": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "addPoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "addPoint",
+      "filename": "src/actions/points.ts"
+    },
+    "70c615d73cd81ec259c2e3faefaa2410d1784ed628": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 25141,
+          "async": false,
+          "exportedName": "updatePoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "updatePoint",
+      "filename": "src/actions/points.ts"
     }
   },
   "edge": {}

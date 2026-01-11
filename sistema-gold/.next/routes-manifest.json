@@ -59,6 +59,12 @@
       "namedRegex": "^/dashboard/inventory(?:/)?$"
     },
     {
+      "page": "/dashboard/reports",
+      "regex": "^/dashboard/reports(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/reports(?:/)?$"
+    },
+    {
       "page": "/dashboard/sell",
       "regex": "^/dashboard/sell(?:/)?$",
       "routeKeys": {},
@@ -77,10 +83,10 @@
       "namedRegex": "^/dashboard/transactions(?:/)?$"
     },
     {
-      "page": "/favicon.ico",
-      "regex": "^/favicon\\.ico(?:/)?$",
+      "page": "/icon.png",
+      "regex": "^/icon\\.png(?:/)?$",
       "routeKeys": {},
-      "namedRegex": "^/favicon\\.ico(?:/)?$"
+      "namedRegex": "^/icon\\.png(?:/)?$"
     },
     {
       "page": "/login",

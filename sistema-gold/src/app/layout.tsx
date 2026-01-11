@@ -15,9 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Gold System",
   description: "Sistema de Compra e Venda de Ouro",
-  icons: {
-    icon: '/logo.png',
-  },
+
 };
 
 export default function RootLayout({

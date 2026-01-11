@@ -60,6 +60,21 @@
       "exportedName": "login",
       "filename": "src/actions/auth.ts"
     },
+    "002b6512083828ceae5a051006e3a227e34d293b12": {
+      "workers": {
+        "app/dashboard/inventory/page": {
+          "moduleId": 74622,
+          "async": false,
+          "exportedName": "getCustomers",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/inventory/page": "rsc"
+      },
+      "exportedName": "getCustomers",
+      "filename": "src/actions/transactions.ts"
+    },
     "003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56": {
       "workers": {
         "app/dashboard/inventory/page": {
@@ -133,6 +148,21 @@
         "app/dashboard/inventory/page": "rsc"
       },
       "exportedName": "sell",
+      "filename": "src/actions/transactions.ts"
+    },
+    "7882091f6bdb971a029c4d6ef49e1a7ea0e486c1d8": {
+      "workers": {
+        "app/dashboard/inventory/page": {
+          "moduleId": 74622,
+          "async": false,
+          "exportedName": "getReports",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/inventory/page": "rsc"
+      },
+      "exportedName": "getReports",
       "filename": "src/actions/transactions.ts"
     }
   },

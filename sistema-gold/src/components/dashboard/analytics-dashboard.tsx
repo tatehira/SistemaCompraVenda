@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { ArrowDownCircle, ArrowUpCircle, DollarSign, Scale } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, DollarSign, Scale, ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react'
+import { exportToCSV, exportToPDF } from '@/lib/export-utils'
 import { clsx } from 'clsx'
 
 interface AnalyticsDashboardProps {
@@ -32,6 +33,13 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
     const [endDate, setEndDate] = useState(dateRange.end)
     const [pointId, setPointId] = useState(initialPointId?.toString() || '')
     const [customer, setCustomer] = useState(initialCustomer || '')
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 10
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [transactions])
+
 
     const handleFilter = () => {
         router.push(`/dashboard?from=${startDate}&to=${endDate}&pointId=${pointId}&customer=${customer}`)
@@ -53,6 +61,15 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
     })
 
     const chartData = Array.from(chartDataMap.values()).sort((a, b) => a.date.localeCompare(b.date))
+
+    // Pagination Logic
+    const indexOfLastItem = currentPage * itemsPerPage
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage
+    const currentTransactions = transactions.slice(indexOfFirstItem, indexOfLastItem)
+    const totalPages = Math.ceil(transactions.length / itemsPerPage)
+
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+
 
     return (
         <div className="space-y-8">
@@ -113,6 +130,26 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                         className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 focus:ring-4 focus:ring-indigo-500/30 transition-all h-[42px]"
                     >
                         Filtrar
+                    </button>
+
+                    <div className="h-8 w-px bg-slate-700 mx-2 hidden lg:block"></div>
+
+                    <button
+                        onClick={() => exportToCSV(transactions)}
+                        className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 font-medium rounded-lg text-sm px-4 py-2.5 transition-all h-[42px] flex items-center gap-2"
+                        title="Exportar CSV"
+                    >
+                        <FileText className="w-4 h-4" />
+                        <span className="hidden xl:inline">CSV</span>
+                    </button>
+
+                    <button
+                        onClick={() => exportToPDF(transactions, summary, { start: startDate, end: endDate })}
+                        className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-medium rounded-lg text-sm px-4 py-2.5 transition-all h-[42px] flex items-center gap-2"
+                        title="Exportar PDF"
+                    >
+                        <Download className="w-4 h-4" />
+                        <span className="hidden xl:inline">PDF</span>
                     </button>
                 </div>
             </div>
@@ -260,7 +297,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                                 </tr>
                             </thead>
                             <tbody>
-                                {transactions.map((t) => (
+                                {currentTransactions.map((t) => (
                                     <tr key={t.id} className="border-b border-slate-700/50 last:border-0 hover:bg-white/5 transition-colors">
                                         <td className="px-6 py-4 font-medium text-slate-300">
                                             {new Date(t.date).toLocaleDateString()}
@@ -289,6 +326,33 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                         </table>
                     </div>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center items-center gap-4 mt-6">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                            Anterior
+                        </button>
+
+                        <span className="text-sm text-slate-400">
+                            Página <span className="font-semibold text-white">{currentPage}</span> de <span className="font-semibold text-white">{totalPages}</span>
+                        </span>
+
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            Próximo
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     )

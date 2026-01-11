@@ -4,10 +4,11 @@
   "/dashboard/buy/page": "/dashboard/buy",
   "/dashboard/inventory/page": "/dashboard/inventory",
   "/dashboard/page": "/dashboard",
+  "/dashboard/reports/page": "/dashboard/reports",
   "/dashboard/sell/page": "/dashboard/sell",
   "/dashboard/settings/page": "/dashboard/settings",
   "/dashboard/transactions/page": "/dashboard/transactions",
-  "/favicon.ico/route": "/favicon.ico",
+  "/icon.png/route": "/icon.png",
   "/login/page": "/login",
   "/page": "/"
 }
