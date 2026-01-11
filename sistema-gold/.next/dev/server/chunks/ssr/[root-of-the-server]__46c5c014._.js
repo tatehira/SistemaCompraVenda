@@ -54,25 +54,25 @@ async function deleteGoldType(id) {
     }
 }
 async function getUnits() {
-    return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].prepare('SELECT * FROM measure_units').all();
+    // Return standard units
+    return [
+        {
+            id: 'g',
+            symbol: 'g',
+            name: 'Grama'
+        },
+        {
+            id: 'kg',
+            symbol: 'kg',
+            name: 'Quilo'
+        }
+    ];
 }
 async function addUnit(name, symbol, userId) {
-    if (!name || !symbol) return {
-        error: 'Nome e símbolo são obrigatórios.'
+    // Deprecated / No-op
+    return {
+        success: true
     };
-    try {
-        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].prepare('INSERT INTO measure_units (name, symbol, user_id) VALUES (?, ?, ?)').run(name, symbol, userId);
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/settings');
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/buy'); // Used in buy
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/sell'); // Used in sell
-        return {
-            success: true
-        };
-    } catch (error) {
-        return {
-            error: error.message
-        };
-    }
 }
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
@@ -260,7 +260,7 @@ async function buy(formData) {
         error: 'Não autorizado'
     };
     const userId = Number(session.sub);
-    const weight = parseFloat(formData.get('weight'));
+    let weight = parseFloat(formData.get('weight'));
     const price = parseFloat(formData.get('price'));
     const goldTypeId = Number(formData.get('gold_type_id'));
     const pointId = Number(formData.get('point_id'));
@@ -272,6 +272,10 @@ async function buy(formData) {
             error: 'Preencha os campos obrigatórios.'
         };
     }
+    // NORMALIZE TO GRAMS
+    if (unit === 'kg') {
+        weight = weight * 1000;
+    }
     try {
         const receiptPath = await saveFile(file);
         const date = new Date().toISOString();
@@ -279,6 +283,15 @@ async function buy(formData) {
         INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id, unit) 
         VALUES ('BUY', ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
+        // We store 'weight' (grams) but keep 'unit' as the ORIGINAL input unit for reference if needed, 
+        // OR we standardize 'unit' to 'g' in DB? 
+        // User wants "Entrou 100kg". If we store 'g', we lose that it was input as kg.
+        // Let's store the NORMALIZED weight for math, but maybe we can store the unit context?
+        // Actually, "Unit" column in DB was used for grouping. 
+        // Better strategy: Store everything as 'g' in DB for consistency in grouping. 
+        // The "Unit" column becomes less relevant for calculation, but maybe useful for "Original Input".
+        // However, to make 100kg - 100g math work easily, we must group by GoldTypeId ONLY, not (GoldTypeId + Unit).
+        // So we will force unit to 'g' in the DB or ignore it in grouping.
         stmt.run(weight, price, customer, receiptPath, date, goldTypeId, pointId, userId, unit);
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/inventory');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/transactions');
@@ -297,7 +310,7 @@ async function sell(formData) {
         error: 'Não autorizado'
     };
     const userId = Number(session.sub);
-    const weight = parseFloat(formData.get('weight'));
+    let weight = parseFloat(formData.get('weight'));
     const price = parseFloat(formData.get('price'));
     const goldTypeId = Number(formData.get('gold_type_id'));
     const pointId = Number(formData.get('point_id'));
@@ -311,6 +324,10 @@ async function sell(formData) {
         return {
             error: 'Preencha os campos obrigatórios.'
         };
+    }
+    // NORMALIZE TO GRAMS
+    if (unit === 'kg') {
+        weight = weight * 1000;
     }
     try {
         const receiptPath = await saveFile(file);
@@ -336,9 +353,9 @@ async function getInventory() {
     if (!session) return [];
     const userId = Number(session.sub);
     // Calculate inventory
-    // Group by Point -> Gold Type -> Unit
+    // Group by Point -> Gold Type ONLY (Ignore unit column for grouping, merge everything to grams)
     const txs = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].prepare(`
-        SELECT t.type, t.weight_grams, t.unit, gt.name as gold_name, p.name as point_name 
+        SELECT t.type, t.weight_grams, gt.name as gold_name, p.name as point_name 
         FROM transactions t
         LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
         LEFT JOIN points p ON t.point_id = p.id
@@ -348,20 +365,19 @@ async function getInventory() {
     txs.forEach((tx)=>{
         const point = tx.point_name || 'Geral';
         const gold = tx.gold_name || 'Desconhecido';
-        const unit = tx.unit || 'g';
-        const key = `${point}-${gold}-${unit}`;
+        // Key is just Point + Gold. We aggregate ALL units here.
+        const key = `${point}-${gold}`;
         if (!inventory[key]) {
             inventory[key] = {
                 point,
                 gold,
-                unit,
-                stock: 0
+                stock_grams: 0
             };
         }
-        if (tx.type === 'BUY') inventory[key].stock += tx.weight_grams;
-        if (tx.type === 'SELL') inventory[key].stock -= tx.weight_grams;
+        if (tx.type === 'BUY') inventory[key].stock_grams += tx.weight_grams;
+        if (tx.type === 'SELL') inventory[key].stock_grams -= tx.weight_grams;
     });
-    return Object.values(inventory).filter((i)=>i.stock !== 0);
+    return Object.values(inventory).filter((i)=>Math.abs(i.stock_grams) > 0.001);
 }
 async function getTransactions() {
     const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getSession"])();
@@ -582,24 +598,24 @@ async function SellPage() {
     const goldTypes = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$gold$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getGoldTypes"])();
     const points = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$points$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getPoints"])();
     const couriers = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$couriers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCouriers"])();
-    const units = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$gold$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getUnits"])();
     var action = $$RSC_SERVER_ACTION_0;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "flex justify-center",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Card"], {
-            className: "w-full max-w-lg",
+            className: "w-full max-w-lg border-amber-200 dark:border-amber-900 shadow-amber-500/10 shadow-lg",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["CardHeader"], {
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["CardTitle"], {
+                        className: "text-amber-600 dark:text-amber-500",
                         children: "Nova Venda"
                     }, void 0, false, {
                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                        lineNumber: 31,
+                        lineNumber: 30,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                    lineNumber: 30,
+                    lineNumber: 29,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -616,30 +632,30 @@ async function SellPage() {
                                                 children: "Local de Saída"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 37,
+                                                lineNumber: 36,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                                 name: "point_id",
-                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800",
+                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500",
                                                 required: true,
                                                 children: points.map((p)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                         value: p.id,
                                                         children: p.name
                                                     }, p.id, false, {
                                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                        lineNumber: 39,
+                                                        lineNumber: 38,
                                                         columnNumber: 61
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 38,
+                                                lineNumber: 37,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 36,
+                                        lineNumber: 35,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -648,36 +664,36 @@ async function SellPage() {
                                                 children: "Tipo de Ouro"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 43,
+                                                lineNumber: 42,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                                 name: "gold_type_id",
-                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800",
+                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500",
                                                 required: true,
                                                 children: goldTypes.map((g)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                         value: g.id,
                                                         children: g.name
                                                     }, g.id, false, {
                                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                        lineNumber: 45,
+                                                        lineNumber: 44,
                                                         columnNumber: 64
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 44,
+                                                lineNumber: 43,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 42,
+                                        lineNumber: 41,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                lineNumber: 35,
+                                lineNumber: 34,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -689,7 +705,7 @@ async function SellPage() {
                                                 children: "Peso"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 52,
+                                                lineNumber: 51,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Input"], {
@@ -699,13 +715,13 @@ async function SellPage() {
                                                 required: true
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 53,
+                                                lineNumber: 52,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 51,
+                                        lineNumber: 50,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -714,50 +730,45 @@ async function SellPage() {
                                                 children: "Unidade"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 56,
+                                                lineNumber: 55,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                                 name: "unit",
-                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800",
+                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                         value: "g",
                                                         children: "Grama (g)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                        lineNumber: 58,
+                                                        lineNumber: 57,
                                                         columnNumber: 37
                                                     }, this),
-                                                    units.map((u)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: u.symbol,
-                                                            children: [
-                                                                u.name,
-                                                                " (",
-                                                                u.symbol,
-                                                                ")"
-                                                            ]
-                                                        }, u.id, true, {
-                                                            fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                            lineNumber: 59,
-                                                            columnNumber: 60
-                                                        }, this))
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                        value: "kg",
+                                                        children: "Quilo (kg)"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/dashboard/sell/page.tsx",
+                                                        lineNumber: 58,
+                                                        columnNumber: 37
+                                                    }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 57,
+                                                lineNumber: 56,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 55,
+                                        lineNumber: 54,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                lineNumber: 50,
+                                lineNumber: 49,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -766,7 +777,7 @@ async function SellPage() {
                                         children: "Preço de Venda (R$)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 65,
+                                        lineNumber: 64,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Input"], {
@@ -776,13 +787,13 @@ async function SellPage() {
                                         required: true
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 66,
+                                        lineNumber: 65,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                lineNumber: 64,
+                                lineNumber: 63,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -791,7 +802,7 @@ async function SellPage() {
                                         children: "Cliente"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 70,
+                                        lineNumber: 69,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Input"], {
@@ -799,13 +810,13 @@ async function SellPage() {
                                         placeholder: "Nome do cliente"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 71,
+                                        lineNumber: 70,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                lineNumber: 69,
+                                lineNumber: 68,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -817,19 +828,19 @@ async function SellPage() {
                                                 children: "Entregador (Opcional)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 76,
+                                                lineNumber: 75,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                                 name: "delivery_courier",
-                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800",
+                                                className: "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                         value: "",
                                                         children: "Nenhum / Retirada"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                        lineNumber: 78,
+                                                        lineNumber: 77,
                                                         columnNumber: 37
                                                     }, this),
                                                     couriers.map((c)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -837,19 +848,19 @@ async function SellPage() {
                                                             children: c.name
                                                         }, c.id, false, {
                                                             fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                            lineNumber: 79,
+                                                            lineNumber: 78,
                                                             columnNumber: 63
                                                         }, this))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 77,
+                                                lineNumber: 76,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 75,
+                                        lineNumber: 74,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -858,7 +869,7 @@ async function SellPage() {
                                                 children: "Custo Entrega (R$)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 83,
+                                                lineNumber: 82,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Input"], {
@@ -868,19 +879,19 @@ async function SellPage() {
                                                 placeholder: "0.00"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                                lineNumber: 84,
+                                                lineNumber: 83,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 82,
+                                        lineNumber: 81,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                lineNumber: 74,
+                                lineNumber: 73,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -889,7 +900,7 @@ async function SellPage() {
                                         children: "Comprovante (Foto)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 89,
+                                        lineNumber: 88,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Input"], {
@@ -898,44 +909,44 @@ async function SellPage() {
                                         accept: "image/*"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                        lineNumber: 90,
+                                        lineNumber: 89,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                lineNumber: 88,
+                                lineNumber: 87,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Button"], {
                                 type: "submit",
-                                className: "w-full bg-green-600 hover:bg-green-700",
+                                className: "w-full bg-green-600 hover:bg-green-700 text-white",
                                 children: "Registrar Venda"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                                lineNumber: 93,
+                                lineNumber: 92,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                        lineNumber: 34,
+                        lineNumber: 33,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/dashboard/sell/page.tsx",
-                    lineNumber: 33,
+                    lineNumber: 32,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/dashboard/sell/page.tsx",
-            lineNumber: 29,
+            lineNumber: 28,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/dashboard/sell/page.tsx",
-        lineNumber: 28,
+        lineNumber: 27,
         columnNumber: 9
     }, this);
 }

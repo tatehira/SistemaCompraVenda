@@ -54,25 +54,25 @@ async function deleteGoldType(id) {
     }
 }
 async function getUnits() {
-    return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].prepare('SELECT * FROM measure_units').all();
+    // Return standard units
+    return [
+        {
+            id: 'g',
+            symbol: 'g',
+            name: 'Grama'
+        },
+        {
+            id: 'kg',
+            symbol: 'kg',
+            name: 'Quilo'
+        }
+    ];
 }
 async function addUnit(name, symbol, userId) {
-    if (!name || !symbol) return {
-        error: 'Nome e símbolo são obrigatórios.'
+    // Deprecated / No-op
+    return {
+        success: true
     };
-    try {
-        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"].prepare('INSERT INTO measure_units (name, symbol, user_id) VALUES (?, ?, ?)').run(name, symbol, userId);
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/settings');
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/buy'); // Used in buy
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/dashboard/sell'); // Used in sell
-        return {
-            success: true
-        };
-    } catch (error) {
-        return {
-            error: error.message
-        };
-    }
 }
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
@@ -216,7 +216,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$auth$2e$ts
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$gold$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/actions/gold.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$points$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/actions/points.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$actions$2f$couriers$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/actions/couriers.ts [app-rsc] (ecmascript)");
-;
 ;
 ;
 ;

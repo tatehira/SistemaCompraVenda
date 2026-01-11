@@ -29,20 +29,16 @@ export async function deleteGoldType(id: number) {
     }
 }
 
-// --- Measure Units ---
+// --- Units (Static for now) ---
 export async function getUnits() {
-    return db.prepare('SELECT * FROM measure_units').all()
+    // Return standard units
+    return [
+        { id: 'g', symbol: 'g', name: 'Grama' },
+        { id: 'kg', symbol: 'kg', name: 'Quilo' }
+    ]
 }
 
 export async function addUnit(name: string, symbol: string, userId: number) {
-    if (!name || !symbol) return { error: 'Nome e símbolo são obrigatórios.' }
-    try {
-        db.prepare('INSERT INTO measure_units (name, symbol, user_id) VALUES (?, ?, ?)').run(name, symbol, userId)
-        revalidatePath('/dashboard/settings')
-        revalidatePath('/dashboard/buy') // Used in buy
-        revalidatePath('/dashboard/sell') // Used in sell
-        return { success: true }
-    } catch (error: any) {
-        return { error: error.message }
-    }
+    // Deprecated / No-op
+    return { success: true }
 }

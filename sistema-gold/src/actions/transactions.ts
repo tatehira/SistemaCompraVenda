@@ -28,7 +28,7 @@ export async function buy(formData: FormData) {
     if (!session) return { error: 'Não autorizado' }
     const userId = Number(session.sub)
 
-    const weight = parseFloat(formData.get('weight') as string)
+    let weight = parseFloat(formData.get('weight') as string)
     const price = parseFloat(formData.get('price') as string)
     const goldTypeId = Number(formData.get('gold_type_id'))
     const pointId = Number(formData.get('point_id'))
@@ -40,6 +40,11 @@ export async function buy(formData: FormData) {
         return { error: 'Preencha os campos obrigatórios.' }
     }
 
+    // NORMALIZE TO GRAMS
+    if (unit === 'kg') {
+        weight = weight * 1000
+    }
+
     try {
         const receiptPath = await saveFile(file)
         const date = new Date().toISOString()
@@ -48,6 +53,16 @@ export async function buy(formData: FormData) {
         INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id, unit) 
         VALUES ('BUY', ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
+        // We store 'weight' (grams) but keep 'unit' as the ORIGINAL input unit for reference if needed, 
+        // OR we standardize 'unit' to 'g' in DB? 
+        // User wants "Entrou 100kg". If we store 'g', we lose that it was input as kg.
+        // Let's store the NORMALIZED weight for math, but maybe we can store the unit context?
+        // Actually, "Unit" column in DB was used for grouping. 
+        // Better strategy: Store everything as 'g' in DB for consistency in grouping. 
+        // The "Unit" column becomes less relevant for calculation, but maybe useful for "Original Input".
+        // However, to make 100kg - 100g math work easily, we must group by GoldTypeId ONLY, not (GoldTypeId + Unit).
+        // So we will force unit to 'g' in the DB or ignore it in grouping.
+
         stmt.run(weight, price, customer, receiptPath, date, goldTypeId, pointId, userId, unit)
 
         revalidatePath('/dashboard/inventory')
@@ -63,7 +78,7 @@ export async function sell(formData: FormData) {
     if (!session) return { error: 'Não autorizado' }
     const userId = Number(session.sub)
 
-    const weight = parseFloat(formData.get('weight') as string)
+    let weight = parseFloat(formData.get('weight') as string)
     const price = parseFloat(formData.get('price') as string)
     const goldTypeId = Number(formData.get('gold_type_id'))
     const pointId = Number(formData.get('point_id'))
@@ -78,6 +93,11 @@ export async function sell(formData: FormData) {
 
     if (!weight || !price || !goldTypeId || !pointId) {
         return { error: 'Preencha os campos obrigatórios.' }
+    }
+
+    // NORMALIZE TO GRAMS
+    if (unit === 'kg') {
+        weight = weight * 1000
     }
 
     try {
@@ -104,9 +124,9 @@ export async function getInventory() {
     const userId = Number(session.sub)
 
     // Calculate inventory
-    // Group by Point -> Gold Type -> Unit
+    // Group by Point -> Gold Type ONLY (Ignore unit column for grouping, merge everything to grams)
     const txs = db.prepare(`
-        SELECT t.type, t.weight_grams, t.unit, gt.name as gold_name, p.name as point_name 
+        SELECT t.type, t.weight_grams, gt.name as gold_name, p.name as point_name 
         FROM transactions t
         LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
         LEFT JOIN points p ON t.point_id = p.id
@@ -118,23 +138,22 @@ export async function getInventory() {
     txs.forEach(tx => {
         const point = tx.point_name || 'Geral'
         const gold = tx.gold_name || 'Desconhecido'
-        const unit = tx.unit || 'g'
-        const key = `${point}-${gold}-${unit}`
+        // Key is just Point + Gold. We aggregate ALL units here.
+        const key = `${point}-${gold}`
 
         if (!inventory[key]) {
             inventory[key] = {
                 point,
                 gold,
-                unit,
-                stock: 0
+                stock_grams: 0
             }
         }
 
-        if (tx.type === 'BUY') inventory[key].stock += tx.weight_grams
-        if (tx.type === 'SELL') inventory[key].stock -= tx.weight_grams
+        if (tx.type === 'BUY') inventory[key].stock_grams += tx.weight_grams
+        if (tx.type === 'SELL') inventory[key].stock_grams -= tx.weight_grams
     })
 
-    return Object.values(inventory).filter((i: any) => i.stock !== 0)
+    return Object.values(inventory).filter((i: any) => Math.abs(i.stock_grams) > 0.001)
 }
 
 export async function getTransactions() {

@@ -1,4 +1,4 @@
-import { getGoldTypes, getUnits } from '@/actions/gold'
+import { getGoldTypes } from '@/actions/gold'
 import { getPoints } from '@/actions/points'
 import { getCouriers } from '@/actions/couriers'
 import { sell } from '@/actions/transactions'
@@ -12,7 +12,6 @@ export default async function SellPage() {
     const goldTypes = await getGoldTypes()
     const points = await getPoints()
     const couriers = await getCouriers()
-    const units = await getUnits()
 
     async function action(formData: FormData) {
         'use server'
@@ -26,22 +25,22 @@ export default async function SellPage() {
 
     return (
         <div className="flex justify-center">
-            <Card className="w-full max-w-lg">
+            <Card className="w-full max-w-lg border-amber-200 dark:border-amber-900 shadow-amber-500/10 shadow-lg">
                 <CardHeader>
-                    <CardTitle>Nova Venda</CardTitle>
+                    <CardTitle className="text-amber-600 dark:text-amber-500">Nova Venda</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form action={action} className="grid gap-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Label>Local de Saída</Label>
-                                <select name="point_id" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800" required>
+                                <select name="point_id" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500" required>
                                     {points.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
                                 </select>
                             </div>
                             <div>
                                 <Label>Tipo de Ouro</Label>
-                                <select name="gold_type_id" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800" required>
+                                <select name="gold_type_id" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500" required>
                                     {goldTypes.map((g: any) => <option key={g.id} value={g.id}>{g.name}</option>)}
                                 </select>
                             </div>
@@ -54,9 +53,9 @@ export default async function SellPage() {
                             </div>
                             <div>
                                 <Label>Unidade</Label>
-                                <select name="unit" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800">
+                                <select name="unit" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500">
                                     <option value="g">Grama (g)</option>
-                                    {units.map((u: any) => <option key={u.id} value={u.symbol}>{u.name} ({u.symbol})</option>)}
+                                    <option value="kg">Quilo (kg)</option>
                                 </select>
                             </div>
                         </div>
@@ -74,7 +73,7 @@ export default async function SellPage() {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Label>Entregador (Opcional)</Label>
-                                <select name="delivery_courier" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800">
+                                <select name="delivery_courier" className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:bg-zinc-950 dark:border-zinc-800 focus:ring-amber-500">
                                     <option value="">Nenhum / Retirada</option>
                                     {couriers.map((c: any) => <option key={c.id} value={c.name}>{c.name}</option>)}
                                 </select>
@@ -90,7 +89,7 @@ export default async function SellPage() {
                             <Input name="receipt" type="file" accept="image/*" />
                         </div>
 
-                        <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">Registrar Venda</Button>
+                        <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white">Registrar Venda</Button>
                     </form>
                 </CardContent>
             </Card>

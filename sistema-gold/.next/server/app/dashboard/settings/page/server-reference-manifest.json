@@ -130,7 +130,7 @@
         }
       },
       "layer": {
-        "app/dashboard/settings/page": "action-browser"
+        "app/dashboard/settings/page": "rsc"
       },
       "exportedName": "addUnit",
       "filename": "src/actions/gold.ts"

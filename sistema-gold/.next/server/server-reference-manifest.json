@@ -369,7 +369,7 @@
       "layer": {
         "app/dashboard/buy/page": "rsc",
         "app/dashboard/sell/page": "rsc",
-        "app/dashboard/settings/page": "action-browser"
+        "app/dashboard/settings/page": "rsc"
       },
       "filename": "src/actions/gold.ts",
       "exportedName": "addUnit"

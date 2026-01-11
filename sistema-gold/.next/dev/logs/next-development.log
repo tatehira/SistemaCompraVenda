@@ -100,3 +100,121 @@ Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
 [00:05:37.048] Server  LOG     SELECT * FROM points
 [00:05:37.049] Server  LOG     SELECT * FROM couriers
 [00:05:37.049] Server  LOG     SELECT * FROM measure_units
+[00:06:14.379] Server  LOG     ✓ Compiled in 21ms
+[00:06:16.368] Server  LOG     ✓ Compiled in 25ms
+[00:06:38.444] Server  LOG     ✓ Compiled in 40ms
+[00:06:48.925] Server  LOG     ✓ Compiled in 27ms
+[00:06:51.780] Server  LOG     ✓ Compiled in 19ms
+[00:07:05.326] Server  LOG     ✓ Compiled in 18ms
+[00:07:07.358] Server  WARN    ⚠ Fast Refresh had to perform a full reload when ./src/app/dashboard/settings/settings-forms.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[00:07:07.484] Server  LOG     ✓ Compiled in 33ms
+[00:07:42.136] Server  LOG     ✓ Compiled in 18ms
+[00:07:43.049] Browser ERROR   ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async LazyResult.runAsync (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:07:44.050] Browser ERROR   ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async LazyResult.runAsync (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:07:47.048] Browser ERROR   ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async LazyResult.runAsync (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:07:47.048] Browser ERROR   ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async LazyResult.runAsync (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:07:47.048] Browser ERROR   ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async LazyResult.runAsync (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:07:49.048] Browser ERROR   ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async LazyResult.runAsync (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:07:49.048] Browser ERROR   ./src/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\src\app\globals.css:1:1: Cannot apply unknown utility class `border-border`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\Nick\Documents\Nick\Sistemas\SistemaCompraVenda\sistema-gold\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+    [at async LazyResult.runAsync (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:08:44.580] Server  LOG     PRAGMA journal_mode = WAL
+[00:09:07.947] Server  LOG     PRAGMA journal_mode = WAL
+[00:09:13.314] Server  LOG     ✓ Compiled in 30ms
+[00:09:15.367] Server  LOG     PRAGMA journal_mode = WAL

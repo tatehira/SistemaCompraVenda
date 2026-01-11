@@ -10,13 +10,14 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant = "default", size = "default", ...props }, ref) => {
 
+        // Updated to use Semantic Variables defined in globals.css
         const variants = {
-            default: "bg-black text-white hover:bg-black/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90",
-            destructive: "bg-red-500 text-zinc-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-zinc-50 dark:hover:bg-red-900/90",
-            outline: "border border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
-            secondary: "bg-zinc-100 text-zinc-900 hover:bg-zinc-100/80 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-800/80",
-            ghost: "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
-            link: "text-zinc-900 underline-offset-4 hover:underline dark:text-zinc-50",
+            default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20",
+            destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-md shadow-destructive/20",
+            outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+            secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+            ghost: "hover:bg-accent hover:text-accent-foreground",
+            link: "text-primary underline-offset-4 hover:underline",
         }
 
         const sizes = {
@@ -29,7 +30,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         return (
             <button
                 className={cn(
-                    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-zinc-950 dark:focus-visible:ring-zinc-300",
+                    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                     variants[variant],
                     sizes[size],
                     className

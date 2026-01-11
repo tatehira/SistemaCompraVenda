@@ -1,20 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-
-// Wait, I put addPoint in points.ts and addCourier in couriers.ts. I need to fix imports.
 import { addPoint as addPointAction, deletePoint as deletePointAction } from '@/actions/points'
 import { addCourier as addCourierAction, deleteCourier as deleteCourierAction } from '@/actions/couriers'
-import { addGoldType as addGoldAction, deleteGoldType as deleteGoldAction, addUnit as addUnitAction } from '@/actions/gold'
+import { addGoldType as addGoldAction, deleteGoldType as deleteGoldAction } from '@/actions/gold'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Trash2 } from 'lucide-react'
 
-// --- Types ---
-// Keep it simple for now, using any or inferred
 export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) {
     const [name, setName] = useState('')
 
@@ -28,7 +23,7 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
     }
 
     return (
-        <Card>
+        <Card className="border-amber-200/50 dark:border-amber-900/50">
             <CardHeader>
                 <CardTitle>Tipos de Ouro</CardTitle>
                 <CardDescription>Cadastre os tipos de ouro (ex: 18k, 24k).</CardDescription>
@@ -36,7 +31,7 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
             <CardContent>
                 <div className="flex gap-2 mb-4">
                     <Input placeholder="Nome (ex: Gold 18k)" value={name} onChange={e => setName(e.target.value)} />
-                    <Button onClick={handleSubmit}>Adicionar</Button>
+                    <Button onClick={handleSubmit} className="bg-amber-600 hover:bg-amber-700 text-white">Adicionar</Button>
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
@@ -68,7 +63,7 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
     }
 
     return (
-        <Card>
+        <Card className="border-amber-200/50 dark:border-amber-900/50">
             <CardHeader>
                 <CardTitle>Locais / Filiais</CardTitle>
                 <CardDescription>Gerencie seus pontos de venda.</CardDescription>
@@ -77,7 +72,7 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
                 <div className="flex flex-col gap-2 mb-4">
                     <Input placeholder="Nome (ex: Loja Centro)" value={name} onChange={e => setName(e.target.value)} />
                     <Input placeholder="Endereço" value={address} onChange={e => setAddress(e.target.value)} />
-                    <Button onClick={handleSubmit}>Adicionar</Button>
+                    <Button onClick={handleSubmit} className="bg-amber-600 hover:bg-amber-700 text-white">Adicionar</Button>
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
@@ -114,7 +109,7 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
     }
 
     return (
-        <Card>
+        <Card className="border-amber-200/50 dark:border-amber-900/50">
             <CardHeader>
                 <CardTitle>Motoboys / Entregadores</CardTitle>
                 <CardDescription>Cadastre seus entregadores.</CardDescription>
@@ -124,7 +119,7 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
                     <Input placeholder="Nome" value={name} onChange={e => setName(e.target.value)} />
                     <Input placeholder="Telefone" value={phone} onChange={e => setPhone(e.target.value)} />
                     <Input placeholder="Taxa Padrão (R$)" type="number" value={fee} onChange={e => setFee(e.target.value)} />
-                    <Button onClick={handleSubmit}>Adicionar</Button>
+                    <Button onClick={handleSubmit} className="bg-amber-600 hover:bg-amber-700 text-white">Adicionar</Button>
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
@@ -136,41 +131,6 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
                             <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>
                                 <Trash2 className="h-4 w-4" />
                             </Button>
-                        </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
-export function UnitsForm({ list, userId }: { list: any[], userId: number }) {
-    const [name, setName] = useState('')
-    const [symbol, setSymbol] = useState('')
-
-    async function handleSubmit() {
-        await addUnitAction(name, symbol, userId)
-        setName('')
-        setSymbol('')
-    }
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Unidades de Medida</CardTitle>
-                <CardDescription>Defina unidades customizadas (ex: Grama, Oitava).</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {/* Note: Delete unit not implemented in legacy fully or risk side effects, leaving add only for now */}
-                <div className="flex flex-col gap-2 mb-4">
-                    <Input placeholder="Nome (ex: Grama)" value={name} onChange={e => setName(e.target.value)} />
-                    <Input placeholder="Símbolo (ex: g)" value={symbol} onChange={e => setSymbol(e.target.value)} />
-                    <Button onClick={handleSubmit}>Adicionar</Button>
-                </div>
-                <div className="space-y-2">
-                    {list.map((item: any) => (
-                        <div key={item.id} className="flex items-center justify-between p-2 border rounded bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-                            <span>{item.name} ({item.symbol})</span>
                         </div>
                     ))}
                 </div>
