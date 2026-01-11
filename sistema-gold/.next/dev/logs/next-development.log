@@ -1,69 +1,102 @@
-[00:00:00.874] Server  LOG     ✓ Ready in 609ms
-[00:00:16.429] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+[00:00:00.790] Server  LOG     ✓ Ready in 551ms
+[00:01:05.126] Server  LOG     ✓ Compiled in 29ms
+[00:01:10.863] Server  LOG     ✓ Compiled in 29ms
+[00:01:12.874] Server  LOG     ✓ Compiled in 29ms
+[00:01:20.012] Server  LOG     ✓ Compiled in 23ms
+[00:01:52.208] Server  WARN    ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:01:52.567] Server  LOG     ✓ Compiled in 288ms
+[00:01:52.877] Browser ERROR   ./src/middleware.ts
+Middleware is missing expected function export name
+This function is what Next.js runs for every request handled by this middleware.
 
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
+Why this happens:
+- The file exists but doesn't export a function.
+- The export is not a function (e.g., an object or constant).
+- There's a syntax error preventing the export from being recognized.
 
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+To fix it:
+- Ensure this file has either a default or "middleware" function export.
 
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
-      <AppDevOverlayErrorBoundary globalError={[...]}>
-        <ReplaySsrOnlyErrors>
-        <DevRootHTTPAccessFallbackBoundary>
-          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
-            <HTTPAccessFallbackErrorBoundary pathname="/dashboard" notFound={<NotAllowedRootHTTPFallbackError>} ...>
-              <RedirectBoundary>
-                <RedirectErrorBoundary router={{...}}>
-                  <Head>
-                  <__next_root_layout_boundary__>
-                    <SegmentViewNode type="layout" pagePath="layout.tsx">
-                      <SegmentTrieNode>
-                      <link>
-                      <script>
-                      <RootLayout>
-                        <html
-                          lang="en"
--                         data-google-analytics-opt-out=""
-                        >
-                  ...
-
-[00:00:17.894] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
-      <AppDevOverlayErrorBoundary globalError={[...]}>
-        <ReplaySsrOnlyErrors>
-        <DevRootHTTPAccessFallbackBoundary>
-          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
-            <HTTPAccessFallbackErrorBoundary pathname="/dashboard" notFound={<NotAllowedRootHTTPFallbackError>} ...>
-              <RedirectBoundary>
-                <RedirectErrorBoundary router={{...}}>
-                  <Head>
-                  <__next_root_layout_boundary__>
-                    <SegmentViewNode type="layout" pagePath="layout.tsx">
-                      <SegmentTrieNode>
-                      <link>
-                      <script>
-                      <RootLayout>
-                        <html
-                          lang="en"
--                         data-google-analytics-opt-out=""
-                        >
-                  ...
-
+Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:02:10.798] Server  LOG     ✓ Compiled in 20ms
+[00:02:12.792] Server  LOG     ✓ Compiled in 24ms
+[00:02:41.232] Server  LOG     ✓ Compiled in 54ms
+[00:02:58.952] Server  LOG     ✓ Compiled in 39ms
+[00:03:02.359] Server  LOG     ✓ Compiled in 24ms
+[00:03:09.992] Server  LOG     ✓ Compiled in 49ms
+[00:03:11.993] Server  LOG     ✓ Compiled in 49ms
+[00:03:32.053] Server  LOG     PRAGMA journal_mode = WAL
+[00:03:32.054] Server  LOG     SELECT * FROM users WHERE username = 'nick' AND password = 'nick'
+[00:03:35.892] Server  LOG     SELECT * FROM gold_types
+[00:03:35.895] Server  LOG     SELECT * FROM points
+[00:03:35.895] Server  LOG     SELECT * FROM measure_units
+[00:03:36.900] Server  LOG     SELECT * FROM gold_types
+[00:03:36.904] Server  LOG     SELECT * FROM points
+[00:03:36.905] Server  LOG     SELECT * FROM couriers
+[00:03:36.905] Server  LOG     SELECT * FROM measure_units
+[00:03:37.676] Server  LOG     
+        SELECT t.type, t.weight_grams, t.unit, gt.name as gold_name, p.name as point_name 
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = 2.0
+    
+[00:03:38.160] Server  LOG     
+        SELECT t.*, gt.name as gold_name, p.name as point_name
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = 2.0
+        ORDER BY date DESC
+    
+[00:03:38.672] Server  LOG     SELECT * FROM gold_types
+[00:03:38.673] Server  LOG     SELECT * FROM points
+[00:03:38.673] Server  LOG     SELECT * FROM couriers
+[00:03:38.673] Server  LOG     SELECT * FROM measure_units
+[00:03:43.127] Server  LOG     SELECT * FROM gold_types
+[00:03:43.129] Server  LOG     SELECT * FROM points
+[00:03:43.130] Server  LOG     SELECT * FROM measure_units
+[00:03:43.593] Server  LOG     SELECT * FROM gold_types
+[00:03:43.597] Server  LOG     SELECT * FROM points
+[00:03:43.597] Server  LOG     SELECT * FROM couriers
+[00:03:43.598] Server  LOG     SELECT * FROM measure_units
+[00:03:44.749] Server  LOG     
+        SELECT t.type, t.weight_grams, t.unit, gt.name as gold_name, p.name as point_name 
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = 2.0
+    
+[00:05:22.025] Server  LOG     SELECT * FROM gold_types
+[00:05:22.028] Server  LOG     SELECT * FROM points
+[00:05:22.028] Server  LOG     SELECT * FROM measure_units
+[00:05:22.878] Server  LOG     SELECT * FROM gold_types
+[00:05:22.881] Server  LOG     SELECT * FROM points
+[00:05:22.881] Server  LOG     SELECT * FROM couriers
+[00:05:22.882] Server  LOG     SELECT * FROM measure_units
+[00:05:23.421] Server  LOG     
+        SELECT t.type, t.weight_grams, t.unit, gt.name as gold_name, p.name as point_name 
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = 2.0
+    
+[00:05:23.718] Server  LOG     
+        SELECT t.*, gt.name as gold_name, p.name as point_name
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = 2.0
+        ORDER BY date DESC
+    
+[00:05:24.162] Server  LOG     SELECT * FROM gold_types
+[00:05:24.162] Server  LOG     SELECT * FROM points
+[00:05:24.162] Server  LOG     SELECT * FROM couriers
+[00:05:24.163] Server  LOG     SELECT * FROM measure_units
+[00:05:36.407] Server  LOG     SELECT * FROM gold_types
+[00:05:36.409] Server  LOG     SELECT * FROM points
+[00:05:36.410] Server  LOG     SELECT * FROM measure_units
+[00:05:37.046] Server  LOG     SELECT * FROM gold_types
+[00:05:37.048] Server  LOG     SELECT * FROM points
+[00:05:37.049] Server  LOG     SELECT * FROM couriers
+[00:05:37.049] Server  LOG     SELECT * FROM measure_units

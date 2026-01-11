@@ -10,9 +10,6 @@ var __TURBOPACK__imported__module__$5b$externals$5d2f$better$2d$sqlite3__$5b$ext
 var __TURBOPACK__imported__module__$5b$externals$5d2f$path__$5b$external$5d$__$28$path$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/path [external] (path, cjs)");
 ;
 ;
-// Use a distinct database file for the new system, but we will seed it from the old one if needed,
-// or we can copy the old one here.
-// For now, let's look for 'gold_system.db' in the project root.
 const dbPath = __TURBOPACK__imported__module__$5b$externals$5d2f$path__$5b$external$5d$__$28$path$2c$__cjs$29$__["default"].resolve(process.cwd(), 'gold_system.db');
 const db = new __TURBOPACK__imported__module__$5b$externals$5d2f$better$2d$sqlite3__$5b$external$5d$__$28$better$2d$sqlite3$2c$__cjs$2c$__$5b$project$5d2f$node_modules$2f$better$2d$sqlite3$29$__["default"](dbPath, {
     verbose: console.log
@@ -198,7 +195,7 @@ const Button = /*#__PURE__*/ __TURBOPACK__imported__module__$5b$project$5d2f$nod
         ...props
     }, void 0, false, {
         fileName: "[project]/src/components/ui/button.tsx",
-        lineNumber: 37,
+        lineNumber: 30,
         columnNumber: 13
     }, ("TURBOPACK compile-time value", void 0));
 });
