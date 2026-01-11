@@ -86,8 +86,16 @@ export async function sell(formData: FormData) {
     const unit = formData.get('unit') as string || 'g'
 
     // Delivery fields
-    const deliveryCourier = formData.get('delivery_courier') as string
-    const deliveryCost = parseFloat(formData.get('delivery_cost') as string) || 0
+    const deliveryCourierName = formData.get('delivery_courier') as string
+    let deliveryCost = 0
+
+    // If courier selected, fetch standard fee from DB
+    if (deliveryCourierName) {
+        const courier = db.prepare('SELECT fee FROM couriers WHERE name = ? AND user_id = ?').get(deliveryCourierName, userId) as any
+        if (courier) {
+            deliveryCost = courier.fee || 0
+        }
+    }
 
     const file = formData.get('receipt') as File
 
@@ -108,7 +116,7 @@ export async function sell(formData: FormData) {
         INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id, unit, delivery_courier, delivery_cost) 
         VALUES ('SELL', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
-        stmt.run(weight, price, customer, receiptPath, date, goldTypeId, pointId, userId, unit, deliveryCourier, deliveryCost)
+        stmt.run(weight, price, customer, receiptPath, date, goldTypeId, pointId, userId, unit, deliveryCourierName, deliveryCost)
 
         revalidatePath('/dashboard/inventory')
         revalidatePath('/dashboard/transactions')

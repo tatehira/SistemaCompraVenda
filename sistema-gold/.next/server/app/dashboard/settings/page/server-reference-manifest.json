@@ -25,7 +25,7 @@
         }
       },
       "layer": {
-        "app/dashboard/settings/page": "rsc"
+        "app/dashboard/settings/page": "action-browser"
       },
       "exportedName": "logout",
       "filename": "src/actions/auth.ts"

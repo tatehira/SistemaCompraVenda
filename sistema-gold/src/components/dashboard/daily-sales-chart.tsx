@@ -14,7 +14,7 @@ export function DailySalesChart({ data }: { data: any[] }) {
                 <CardDescription>Acompanhamento do volume de vendas</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="h-[300px] w-full">
+                <div className="h-[300px] w-full min-w-0">
                     {data.length === 0 ? (
                         <div className="flex h-full items-center justify-center text-zinc-400">
                             Sem dados de vendas recentes.
