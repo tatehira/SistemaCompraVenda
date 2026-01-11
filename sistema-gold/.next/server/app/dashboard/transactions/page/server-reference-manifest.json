@@ -1,0 +1,125 @@
+{
+  "node": {
+    "00a5fb6db855bcb8de8eb3a3a932b31c246b050806": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "getSession",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "getSession",
+      "filename": "src/actions/auth.ts"
+    },
+    "00bf6aff51c053136cb6843a038c949bec8344cd38": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "logout",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "logout",
+      "filename": "src/actions/auth.ts"
+    },
+    "40de66b91b194dec19db6ac662585f11b7e4a40d7e": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "register",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "register",
+      "filename": "src/actions/auth.ts"
+    },
+    "40fde23bb9f3b5528f0905b64385d2e2c58f4d95ea": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "login",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "login",
+      "filename": "src/actions/auth.ts"
+    },
+    "00ab95d72063df75aa50e57cde3609728199fe6e11": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "getInventory",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "getInventory",
+      "filename": "src/actions/transactions.ts"
+    },
+    "00fab7af394b8cefcf5dc4a8d853b75d19563c842f": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "getTransactions",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "getTransactions",
+      "filename": "src/actions/transactions.ts"
+    },
+    "4011e4ad4af21d24326eb2052b8e6074085bed4aed": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "buy",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "buy",
+      "filename": "src/actions/transactions.ts"
+    },
+    "404c8c67f791b7cd5144b3a290165d08875034dfd4": {
+      "workers": {
+        "app/dashboard/transactions/page": {
+          "moduleId": 47567,
+          "async": false,
+          "exportedName": "sell",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/transactions/page": "rsc"
+      },
+      "exportedName": "sell",
+      "filename": "src/actions/transactions.ts"
+    }
+  },
+  "edge": {}
+}

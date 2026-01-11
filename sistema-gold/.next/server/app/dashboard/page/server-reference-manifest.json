@@ -1,0 +1,65 @@
+{
+  "node": {
+    "00a5fb6db855bcb8de8eb3a3a932b31c246b050806": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 75300,
+          "async": false,
+          "exportedName": "getSession",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "getSession",
+      "filename": "src/actions/auth.ts"
+    },
+    "00bf6aff51c053136cb6843a038c949bec8344cd38": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 75300,
+          "async": false,
+          "exportedName": "logout",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "logout",
+      "filename": "src/actions/auth.ts"
+    },
+    "40de66b91b194dec19db6ac662585f11b7e4a40d7e": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 75300,
+          "async": false,
+          "exportedName": "register",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "register",
+      "filename": "src/actions/auth.ts"
+    },
+    "40fde23bb9f3b5528f0905b64385d2e2c58f4d95ea": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": 75300,
+          "async": false,
+          "exportedName": "login",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "rsc"
+      },
+      "exportedName": "login",
+      "filename": "src/actions/auth.ts"
+    }
+  },
+  "edge": {}
+}

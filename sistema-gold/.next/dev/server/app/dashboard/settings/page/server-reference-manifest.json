@@ -1,0 +1,230 @@
+{
+  "node": {
+    "0002959933141a8591005362d9782db40d573d8cf8": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getSession",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "getSession",
+      "filename": "src/actions/auth.ts"
+    },
+    "00a1b9d856be879042d75ff8dc8dfb1962524258ed": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "logout",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "logout",
+      "filename": "src/actions/auth.ts"
+    },
+    "40e0bd842711d0001166ef627af8cdd4fdfd29a8c8": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "register",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "register",
+      "filename": "src/actions/auth.ts"
+    },
+    "40e3529cc11f2a04b1381f754a6a7c944ce0f2ce39": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "login",
+          "filename": "src/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "login",
+      "filename": "src/actions/auth.ts"
+    },
+    "00d21a24f5b59e38c72ac9d9dabd34fe7beacb3fca": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getGoldTypes",
+          "filename": "src/actions/gold.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "getGoldTypes",
+      "filename": "src/actions/gold.ts"
+    },
+    "00e148d512a9f0c88de30b87a04e918b1e1a8c36c6": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUnits",
+          "filename": "src/actions/gold.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "getUnits",
+      "filename": "src/actions/gold.ts"
+    },
+    "409264ad8a969cb16f0f5f603f3e617c832129ee2a": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteGoldType",
+          "filename": "src/actions/gold.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "exportedName": "deleteGoldType",
+      "filename": "src/actions/gold.ts"
+    },
+    "6052195bed8ff9f808f48a6d14d8bc829aad71a675": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addGoldType",
+          "filename": "src/actions/gold.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "exportedName": "addGoldType",
+      "filename": "src/actions/gold.ts"
+    },
+    "70d5a5be56884eeb232f17c63c8b28382dc4d435f2": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addUnit",
+          "filename": "src/actions/gold.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "exportedName": "addUnit",
+      "filename": "src/actions/gold.ts"
+    },
+    "0020fce195b8defcb4651b1d7d264e54f6addfaf7a": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getPoints",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "getPoints",
+      "filename": "src/actions/points.ts"
+    },
+    "401509319cfa658d001112a73990c2beee117875a6": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deletePoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "exportedName": "deletePoint",
+      "filename": "src/actions/points.ts"
+    },
+    "70e37246521062bf64cd03fcbb55927e68d312ba23": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addPoint",
+          "filename": "src/actions/points.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "exportedName": "addPoint",
+      "filename": "src/actions/points.ts"
+    },
+    "00afe604ffd025a8ab47f48bdaafdda00aa3a623b4": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getCouriers",
+          "filename": "src/actions/couriers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "rsc"
+      },
+      "exportedName": "getCouriers",
+      "filename": "src/actions/couriers.ts"
+    },
+    "40dbfbf9671d93557d3665f79e41e8a5669c8a29a9": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteCourier",
+          "filename": "src/actions/couriers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "exportedName": "deleteCourier",
+      "filename": "src/actions/couriers.ts"
+    },
+    "7850284344ffca868449544ec5c1e2a3df3a4797e3": {
+      "workers": {
+        "app/dashboard/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/dashboard/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/actions/gold.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/src/actions/points.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/src/actions/couriers.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addCourier",
+          "filename": "src/actions/couriers.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/settings/page": "action-browser"
+      },
+      "exportedName": "addCourier",
+      "filename": "src/actions/couriers.ts"
+    }
+  },
+  "edge": {}
+}

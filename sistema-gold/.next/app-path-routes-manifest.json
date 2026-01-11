@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/dashboard/buy/page": "/dashboard/buy",
+  "/dashboard/inventory/page": "/dashboard/inventory",
+  "/dashboard/page": "/dashboard",
+  "/dashboard/sell/page": "/dashboard/sell",
+  "/dashboard/settings/page": "/dashboard/settings",
+  "/dashboard/transactions/page": "/dashboard/transactions",
+  "/favicon.ico/route": "/favicon.ico",
+  "/login/page": "/login",
+  "/page": "/"
+}

@@ -1,0 +1,22 @@
+module.exports=[24868,(a,b,c)=>{b.exports=a.x("fs/promises",()=>require("fs/promises"))},32705,a=>{"use strict";var b=a.i(37936),c=a.i(61469),d=a.i(18558),e=a.i(24868),f=a.i(14747),g=a.i(63707);async function h(a){if(!a||0===a.size)return null;let b=await a.arrayBuffer(),c=Buffer.from(b),d=f.default.join(process.cwd(),"public","uploads");await (0,e.mkdir)(d,{recursive:!0});let g=`${Date.now()}-${a.name.replace(/\s/g,"_")}`,h=f.default.join(d,g);return await (0,e.writeFile)(h,c),`/uploads/${g}`}async function i(a){let b=await (0,g.getSession)();if(!b)return{error:"Não autorizado"};let e=Number(b.sub),f=parseFloat(a.get("weight")),i=parseFloat(a.get("price")),j=Number(a.get("gold_type_id")),k=Number(a.get("point_id")),l=a.get("customer"),m=a.get("receipt"),n=a.get("unit")||"g";if(!f||!i||!j||!k)return{error:"Preencha os campos obrigatórios."};try{let a=await h(m),b=new Date().toISOString();return c.default.prepare(`
+        INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id, unit) 
+        VALUES ('BUY', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(f,i,l,a,b,j,k,e,n),(0,d.revalidatePath)("/dashboard/inventory"),(0,d.revalidatePath)("/dashboard/transactions"),{success:!0}}catch(a){return{error:a.message}}}async function j(a){let b=await (0,g.getSession)();if(!b)return{error:"Não autorizado"};let e=Number(b.sub),f=parseFloat(a.get("weight")),i=parseFloat(a.get("price")),j=Number(a.get("gold_type_id")),k=Number(a.get("point_id")),l=a.get("customer"),m=a.get("unit")||"g",n=a.get("delivery_courier"),o=parseFloat(a.get("delivery_cost"))||0,p=a.get("receipt");if(!f||!i||!j||!k)return{error:"Preencha os campos obrigatórios."};try{let a=await h(p),b=new Date().toISOString();return c.default.prepare(`
+        INSERT INTO transactions (type, weight_grams, price, customer_name, receipt_path, date, gold_type_id, point_id, user_id, unit, delivery_courier, delivery_cost) 
+        VALUES ('SELL', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(f,i,l,a,b,j,k,e,m,n,o),(0,d.revalidatePath)("/dashboard/inventory"),(0,d.revalidatePath)("/dashboard/transactions"),{success:!0}}catch(a){return{error:a.message}}}async function k(){let a=await (0,g.getSession)();if(!a)return[];let b=Number(a.sub),d=c.default.prepare(`
+        SELECT t.type, t.weight_grams, t.unit, gt.name as gold_name, p.name as point_name 
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = ?
+    `).all(b),e={};return d.forEach(a=>{let b=a.point_name||"Geral",c=a.gold_name||"Desconhecido",d=a.unit||"g",f=`${b}-${c}-${d}`;e[f]||(e[f]={point:b,gold:c,unit:d,stock:0}),"BUY"===a.type&&(e[f].stock+=a.weight_grams),"SELL"===a.type&&(e[f].stock-=a.weight_grams)}),Object.values(e).filter(a=>0!==a.stock)}async function l(){let a=await (0,g.getSession)();if(!a)return[];let b=Number(a.sub);return c.default.prepare(`
+        SELECT t.*, gt.name as gold_name, p.name as point_name
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = ?
+        ORDER BY date DESC
+    `).all(b)}(0,a.i(13095).ensureServerEntryExports)([i,j,k,l]),(0,b.registerServerReference)(i,"4011e4ad4af21d24326eb2052b8e6074085bed4aed",null),(0,b.registerServerReference)(j,"404c8c67f791b7cd5144b3a290165d08875034dfd4",null),(0,b.registerServerReference)(k,"00ab95d72063df75aa50e57cde3609728199fe6e11",null),(0,b.registerServerReference)(l,"00fab7af394b8cefcf5dc4a8d853b75d19563c842f",null),a.s(["buy",()=>i,"getInventory",()=>k,"getTransactions",()=>l,"sell",()=>j])},74622,a=>{"use strict";var b=a.i(63707),c=a.i(32705);a.s([],93301),a.i(93301),a.s(["00a5fb6db855bcb8de8eb3a3a932b31c246b050806",()=>b.getSession,"00ab95d72063df75aa50e57cde3609728199fe6e11",()=>c.getInventory,"00bf6aff51c053136cb6843a038c949bec8344cd38",()=>b.logout,"00fab7af394b8cefcf5dc4a8d853b75d19563c842f",()=>c.getTransactions,"4011e4ad4af21d24326eb2052b8e6074085bed4aed",()=>c.buy,"404c8c67f791b7cd5144b3a290165d08875034dfd4",()=>c.sell,"40de66b91b194dec19db6ac662585f11b7e4a40d7e",()=>b.register,"40fde23bb9f3b5528f0905b64385d2e2c58f4d95ea",()=>b.login],74622)}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__5b29677a._.js.map
