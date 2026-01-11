@@ -17,14 +17,14 @@ export default async function InventoryPage() {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {inventory.map((item: any, idx: number) => (
-                    <Card key={idx} className="border-amber-200 dark:border-amber-800">
+                    <Card key={idx} className="border-amber-200 shadow-sm hover:shadow-md transition-shadow">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-zinc-500">
                                 {item.point}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                            <div className="text-2xl font-bold text-amber-600">
                                 {formatWeight(item.stock_grams)}
                             </div>
                             <p className="text-xs text-zinc-500 mt-1 uppercase tracking-wider">
