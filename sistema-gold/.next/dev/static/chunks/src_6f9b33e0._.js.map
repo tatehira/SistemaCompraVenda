@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Nick/Documents/Nick/Sistemas/SistemaCompraVenda/sistema-gold/src/lib/utils.ts"],"sourcesContent":["import { type ClassValue, clsx } from \"clsx\";\r\nimport { twMerge } from \"tailwind-merge\";\r\n\r\nexport function cn(...inputs: ClassValue[]) {\r\n    return twMerge(clsx(inputs));\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;AACA;;;AAEO,SAAS,GAAG,GAAG,MAAoB;IACtC,OAAO,IAAA,yKAAO,EAAC,IAAA,gJAAI,EAAC;AACxB"}},
-    {"offset": {"line": 22, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Nick/Documents/Nick/Sistemas/SistemaCompraVenda/sistema-gold/src/components/ui/label.tsx"],"sourcesContent":["\"use client\"\r\n\r\nimport * as React from \"react\"\r\nimport { cn } from \"@/lib/utils\"\r\n\r\nconst Label = React.forwardRef<\r\n    HTMLLabelElement,\r\n    React.LabelHTMLAttributes<HTMLLabelElement>\r\n>(({ className, ...props }, ref) => (\r\n    <label\r\n        ref={ref}\r\n        className={cn(\r\n            \"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\",\r\n            className\r\n        )}\r\n        {...props}\r\n    />\r\n))\r\nLabel.displayName = \"Label\"\r\n\r\nexport { Label }\r\n"],"names":[],"mappings":";;;;;AAEA;AACA;AAHA;;;;AAKA,MAAM,sBAAQ,2KAAgB,MAG5B,CAAC,EAAE,SAAS,EAAE,GAAG,OAAO,EAAE,oBACxB,6LAAC;QACG,KAAK;QACL,WAAW,IAAA,4HAAE,EACT,8FACA;QAEH,GAAG,KAAK;;;;;;;AAGjB,MAAM,WAAW,GAAG"}}]
-}

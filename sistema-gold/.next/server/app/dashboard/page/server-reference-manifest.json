@@ -1,6 +1,6 @@
 {
   "node": {
-    "00a5fb6db855bcb8de8eb3a3a932b31c246b050806": {
+    "001cff6da69649cb3538ebb44b85726acfda477617": {
       "workers": {
         "app/dashboard/page": {
           "moduleId": 75300,
@@ -15,7 +15,7 @@
       "exportedName": "getSession",
       "filename": "src/actions/auth.ts"
     },
-    "00bf6aff51c053136cb6843a038c949bec8344cd38": {
+    "00f5ae00e140bafd8c394ea98ad441ac36c1f2b778": {
       "workers": {
         "app/dashboard/page": {
           "moduleId": 75300,
@@ -30,7 +30,7 @@
       "exportedName": "logout",
       "filename": "src/actions/auth.ts"
     },
-    "40de66b91b194dec19db6ac662585f11b7e4a40d7e": {
+    "400005926efb722f25cb6dbbee9d650d9ce8a30e42": {
       "workers": {
         "app/dashboard/page": {
           "moduleId": 75300,
@@ -45,7 +45,7 @@
       "exportedName": "register",
       "filename": "src/actions/auth.ts"
     },
-    "40fde23bb9f3b5528f0905b64385d2e2c58f4d95ea": {
+    "40b73d41e742e5c9864de0c62d5bd2bf172ed6c6d1": {
       "workers": {
         "app/dashboard/page": {
           "moduleId": 75300,

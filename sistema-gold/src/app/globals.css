@@ -1,121 +1,120 @@
 @import "tailwindcss";
 
-@theme {
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-
-  @keyframes accordion-down {
-    from {
-      height: 0
-    }
-
-    to {
-      height: var(--radix-accordion-content-height)
-    }
-  }
-
-  @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height)
-    }
-
-    to {
-      height: 0
-    }
-  }
-}
-
-/* 
-  Define the variables in CSS standard way. 
-  Tailwind 4 will pick them up via the mapping above.
-*/
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
-    --primary: 48 96% 53%;
-    /* Amber 500 */
-    --primary-foreground: 26 83% 14%;
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 24 9.8% 10%;
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 24 9.8% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 48 96% 53%;
+    /* 
+       "Vivid Masculine" Theme 
+       Background: Silver/Light Zinc (Not flat white)
+       Accent: Deep Industrial Gold (Amber 600)
+       Text: High Contrast Black/Zinc 900
+    */
+    --background: 244 244 245;
+    /* Zinc 100 - Silver tint */
+    --foreground: 24 24 27;
+    /* Zinc 950 - Sharp Black */
+
+    --card: 255 255 255;
+    /* Pure White */
+    --card-foreground: 24 24 27;
+
+    --popover: 255 255 255;
+    --popover-foreground: 24 24 27;
+
+    /* Vivid Gold - Amber 600 (RGB: 217 119 6) */
+    --primary: 217 119 6;
+    --primary-foreground: 255 255 255;
+    /* White text on gold button */
+
+    --secondary: 228 228 231;
+    /* Zinc 200 */
+    --secondary-foreground: 24 24 27;
+
+    --muted: 228 228 231;
+    --muted-foreground: 113 113 122;
+    /* Zinc 500 */
+
+    --accent: 254 252 232;
+    /* Yellow 50 - Very subtle warm tint for hovers */
+    --accent-foreground: 217 119 6;
+    /* Gold text on hover */
+
+    --destructive: 220 38 38;
+    /* Red 600 */
+    --destructive-foreground: 255 255 255;
+
+    --border: 212 212 216;
+    /* Zinc 300 - Stronger borders */
+    --input: 212 212 216;
+    --ring: 217 119 6;
+
     --radius: 0.5rem;
   }
 
+  /* 
+     OVERRIDING DARK MODE 
+     Even if system says "dark", we force this "Silver/Gold" theme.
+     It maps to the same variables as above.
+  */
   .dark {
-    --background: 240 10% 4%;
-    /* Zinc 950 */
-    --foreground: 60 9.1% 98%;
-    --card: 240 10% 4%;
-    --card-foreground: 60 9.1% 98%;
-    --popover: 240 10% 4%;
-    --popover-foreground: 60 9.1% 98%;
-    --primary: 48 96% 53%;
-    /* Amber 500 */
-    --primary-foreground: 26 83% 14%;
-    --secondary: 240 4% 16%;
-    --secondary-foreground: 60 9.1% 98%;
-    --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 4% 16%;
-    --accent-foreground: 60 9.1% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 60 9.1% 98%;
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 48 96% 53%;
+    --background: 244 244 245;
+    --foreground: 24 24 27;
+    --card: 255 255 255;
+    --card-foreground: 24 24 27;
+    --popover: 255 255 255;
+    --popover-foreground: 24 24 27;
+    --primary: 217 119 6;
+    --primary-foreground: 255 255 255;
+    --secondary: 228 228 231;
+    --secondary-foreground: 24 24 27;
+    --muted: 228 228 231;
+    --muted-foreground: 113 113 122;
+    --accent: 254 252 232;
+    --accent-foreground: 217 119 6;
+    --destructive: 220 38 38;
+    --destructive-foreground: 255 255 255;
+    --border: 212 212 216;
+    --input: 212 212 216;
+    --ring: 217 119 6;
   }
+}
+
+@theme {
+  --color-border: rgb(var(--border));
+  --color-input: rgb(var(--input));
+  --color-ring: rgb(var(--ring));
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+
+  --color-primary: rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+
+  --color-destructive: rgb(var(--destructive));
+  --color-destructive-foreground: rgb(var(--destructive-foreground));
+
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+
+  --color-popover: rgb(var(--popover));
+  --color-popover-foreground: rgb(var(--popover-foreground));
+
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: rgb(var(--border));
+    outline-color: rgb(var(--ring));
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
   }
 }

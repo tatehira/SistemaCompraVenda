@@ -23,7 +23,7 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
     }
 
     return (
-        <Card className="border-amber-200/50 dark:border-amber-900/50">
+        <Card className="border-amber-200/50 bg-white">
             <CardHeader>
                 <CardTitle>Tipos de Ouro</CardTitle>
                 <CardDescription>Cadastre os tipos de ouro (ex: 18k, 24k).</CardDescription>
@@ -35,7 +35,7 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
-                        <div key={item.id} className="flex items-center justify-between p-2 border rounded bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                        <div key={item.id} className="flex items-center justify-between p-2 border rounded bg-zinc-50 border-zinc-200">
                             <span>{item.name}</span>
                             <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>
                                 <Trash2 className="h-4 w-4" />
@@ -63,7 +63,7 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
     }
 
     return (
-        <Card className="border-amber-200/50 dark:border-amber-900/50">
+        <Card className="border-amber-200/50 bg-white">
             <CardHeader>
                 <CardTitle>Locais / Filiais</CardTitle>
                 <CardDescription>Gerencie seus pontos de venda.</CardDescription>
@@ -76,7 +76,7 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
-                        <div key={item.id} className="flex items-center justify-between p-2 border rounded bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                        <div key={item.id} className="flex items-center justify-between p-2 border rounded bg-zinc-50 border-zinc-200">
                             <div>
                                 <div className="font-medium">{item.name}</div>
                                 <div className="text-sm text-zinc-500">{item.address}</div>
@@ -109,7 +109,7 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
     }
 
     return (
-        <Card className="border-amber-200/50 dark:border-amber-900/50">
+        <Card className="border-amber-200/50 bg-white">
             <CardHeader>
                 <CardTitle>Motoboys / Entregadores</CardTitle>
                 <CardDescription>Cadastre seus entregadores.</CardDescription>
@@ -123,7 +123,7 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
-                        <div key={item.id} className="flex items-center justify-between p-2 border rounded bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                        <div key={item.id} className="flex items-center justify-between p-2 border rounded bg-zinc-50 border-zinc-200">
                             <div>
                                 <div className="font-medium">{item.name}</div>
                                 <div className="text-sm text-zinc-500">{item.phone} - R$ {item.default_fee}</div>

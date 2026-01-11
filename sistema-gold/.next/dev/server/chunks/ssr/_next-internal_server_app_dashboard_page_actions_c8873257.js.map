@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Nick/Documents/Nick/Sistemas/SistemaCompraVenda/sistema-gold/.next-internal/server/app/dashboard/page/actions.js%20%28server%20actions%20loader%29"],"sourcesContent":["export {getSession as '0002959933141a8591005362d9782db40d573d8cf8'} from 'ACTIONS_MODULE0'\nexport {logout as '00a1b9d856be879042d75ff8dc8dfb1962524258ed'} from 'ACTIONS_MODULE0'\nexport {register as '40e0bd842711d0001166ef627af8cdd4fdfd29a8c8'} from 'ACTIONS_MODULE0'\nexport {login as '40e3529cc11f2a04b1381f754a6a7c944ce0f2ce39'} from 'ACTIONS_MODULE0'\n"],"names":[],"mappings":";AAAA"}}]
-}
