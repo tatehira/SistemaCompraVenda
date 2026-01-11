@@ -19,6 +19,17 @@ export async function addGoldType(name: string, userId: number) {
     }
 }
 
+export async function updateGoldType(id: number, name: string) {
+    if (!name) return { error: 'Nome é obrigatório.' }
+    try {
+        db.prepare('UPDATE gold_types SET name = ? WHERE id = ?').run(name, id)
+        revalidatePath('/dashboard/settings')
+        return { success: true }
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
+
 export async function deleteGoldType(id: number) {
     try {
         db.prepare('DELETE FROM gold_types WHERE id = ?').run(id)

@@ -18,6 +18,17 @@ export async function addCourier(name: string, phone: string, defaultFee: number
     }
 }
 
+export async function updateCourier(id: number, name: string, phone: string, defaultFee: number) {
+    if (!name) return { error: 'Nome é obrigatório.' }
+    try {
+        db.prepare('UPDATE couriers SET name = ?, phone = ?, default_fee = ? WHERE id = ?').run(name, phone, defaultFee, id)
+        revalidatePath('/dashboard/settings')
+        return { success: true }
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
+
 export async function deleteCourier(id: number) {
     try {
         db.prepare('DELETE FROM couriers WHERE id = ?').run(id)

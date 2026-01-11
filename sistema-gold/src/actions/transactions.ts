@@ -195,3 +195,67 @@ export async function getDailySales() {
         LIMIT 30
     `).all(userId)
 }
+
+export async function getCustomers() {
+    const session = await getSession()
+    if (!session) return []
+    const userId = Number(session.sub)
+
+    const result = db.prepare(`
+        SELECT DISTINCT customer_name 
+        FROM transactions 
+        WHERE user_id = ? 
+        AND customer_name IS NOT NULL 
+        AND customer_name != ''
+        ORDER BY customer_name ASC
+    `).all(userId) as any[]
+
+    return result.map(r => r.customer_name)
+}
+
+export async function getReports(startDate: string, endDate: string, pointId?: number, customerName?: string) {
+    const session = await getSession()
+    if (!session) return { transactions: [], summary: { totalBuy: 0, totalSell: 0, balance: 0, totalBuyWeight: 0, totalSellWeight: 0 } }
+    const userId = Number(session.sub)
+
+    let query = `
+        SELECT t.*, gt.name as gold_name, p.name as point_name
+        FROM transactions t
+        LEFT JOIN gold_types gt ON t.gold_type_id = gt.id
+        LEFT JOIN points p ON t.point_id = p.id
+        WHERE t.user_id = ? 
+        AND date(t.date) >= date(?) 
+        AND date(t.date) <= date(?)
+    `
+
+    const params: any[] = [userId, startDate, endDate]
+
+    if (pointId) {
+        query += ` AND t.point_id = ?`
+        params.push(pointId)
+    }
+
+    if (customerName) {
+        query += ` AND t.customer_name = ?`
+        params.push(customerName)
+    }
+
+    query += ` ORDER BY t.date DESC`
+
+    const transactions = db.prepare(query).all(...params) as any[]
+
+    const summary = transactions.reduce((acc, tx) => {
+        if (tx.type === 'BUY') {
+            acc.totalBuy += tx.price
+            acc.totalBuyWeight += tx.weight_grams
+            acc.balance -= tx.price
+        } else if (tx.type === 'SELL') {
+            acc.totalSell += tx.price
+            acc.totalSellWeight += tx.weight_grams
+            acc.balance += tx.price
+        }
+        return acc
+    }, { totalBuy: 0, totalSell: 0, balance: 0, totalBuyWeight: 0, totalSellWeight: 0 })
+
+    return { transactions, summary }
+}

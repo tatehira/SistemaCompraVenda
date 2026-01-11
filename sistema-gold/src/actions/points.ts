@@ -18,6 +18,17 @@ export async function addPoint(name: string, address: string, userId: number) {
     }
 }
 
+export async function updatePoint(id: number, name: string, address: string) {
+    if (!name) return { error: 'Nome é obrigatório.' }
+    try {
+        db.prepare('UPDATE points SET name = ?, address = ? WHERE id = ?').run(name, address, id)
+        revalidatePath('/dashboard/settings')
+        return { success: true }
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
+
 export async function deletePoint(id: number) {
     try {
         db.prepare('DELETE FROM points WHERE id = ?').run(id)

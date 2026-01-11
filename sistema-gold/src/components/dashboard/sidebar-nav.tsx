@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
-import { LayoutDashboard, ShoppingCart, DollarSign, Package, History, Settings } from 'lucide-react'
+import { LayoutDashboard, ShoppingCart, DollarSign, Package, History, Settings, FileText } from 'lucide-react'
 
 const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const navItems = [
     { href: '/dashboard/sell', label: 'Vender', icon: DollarSign },
     { href: '/dashboard/inventory', label: 'Estoque', icon: Package },
     { href: '/dashboard/transactions', label: 'Histórico', icon: History },
+    { href: '/dashboard/reports', label: 'Relatórios', icon: FileText },
     { href: '/dashboard/settings', label: 'Configurações', icon: Settings },
 ]
 

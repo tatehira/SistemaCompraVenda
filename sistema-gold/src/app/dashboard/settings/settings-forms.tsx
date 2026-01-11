@@ -8,14 +8,31 @@ import { addGoldType as addGoldAction, deleteGoldType as deleteGoldAction } from
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Trash2, MapPin, Phone, DollarSign, Gem } from 'lucide-react'
+import { Trash2, MapPin, Phone, DollarSign, Gem, Pencil } from 'lucide-react'
 
 export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) {
     const [name, setName] = useState('')
+    const [editingId, setEditingId] = useState<number | null>(null)
 
     async function handleSubmit() {
         if (!name) return
-        await addGoldAction(name, userId)
+
+        if (editingId) {
+            await import('@/actions/gold').then(mod => mod.updateGoldType(editingId, name))
+            setEditingId(null)
+        } else {
+            await addGoldAction(name, userId)
+        }
+        setName('')
+    }
+
+    function handleEdit(item: any) {
+        setEditingId(item.id)
+        setName(item.name)
+    }
+
+    function handleCancel() {
+        setEditingId(null)
         setName('')
     }
 
@@ -41,16 +58,26 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
                         className="bg-slate-900/50 border-indigo-500/20 text-white placeholder:text-slate-400 focus-visible:ring-indigo-500"
                     />
                     <Button onClick={handleSubmit} className="bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20">
-                        Adicionar
+                        {editingId ? 'Atualizar' : 'Adicionar'}
                     </Button>
+                    {editingId && (
+                        <Button onClick={handleCancel} variant="outline" className="text-slate-300 border-slate-600 hover:bg-slate-800">
+                            Cancelar
+                        </Button>
+                    )}
                 </div>
                 <div className="space-y-3">
                     {list.map((item: any) => (
                         <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg bg-slate-800/50 border-slate-700 hover:border-indigo-500/30 transition-colors">
                             <span className="text-slate-200 font-medium">{item.name}</span>
-                            <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8" onClick={() => handleDelete(item.id)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button variant="ghost" size="icon" className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 h-8 w-8" onClick={() => handleEdit(item)}>
+                                    <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8" onClick={() => handleDelete(item.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
                     {list.length === 0 && <p className="text-center text-sm text-slate-400 py-4">Nenhum tipo cadastrado.</p>}
@@ -63,10 +90,29 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
 export function PointsForm({ list, userId }: { list: any[], userId: number }) {
     const [name, setName] = useState('')
     const [address, setAddress] = useState('')
+    const [editingId, setEditingId] = useState<number | null>(null)
 
     async function handleSubmit() {
         if (!name) return
-        await addPointAction(name, address, userId)
+
+        if (editingId) {
+            await import('@/actions/points').then(mod => mod.updatePoint(editingId, name, address))
+            setEditingId(null)
+        } else {
+            await addPointAction(name, address, userId)
+        }
+        setName('')
+        setAddress('')
+    }
+
+    function handleEdit(item: any) {
+        setEditingId(item.id)
+        setName(item.name)
+        setAddress(item.address || '')
+    }
+
+    function handleCancel() {
+        setEditingId(null)
         setName('')
         setAddress('')
     }
@@ -100,8 +146,13 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
                             className="bg-slate-900/50 border-indigo-500/20 text-white placeholder:text-slate-400 focus-visible:ring-emerald-500"
                         />
                         <Button onClick={handleSubmit} className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 shrink-0">
-                            Adicionar
+                            {editingId ? 'Atualizar' : 'Adicionar'}
                         </Button>
+                        {editingId && (
+                            <Button onClick={handleCancel} variant="outline" className="text-slate-300 border-slate-600 hover:bg-slate-800 shrink-0">
+                                Cancelar
+                            </Button>
+                        )}
                     </div>
                 </div>
                 <div className="space-y-3">
@@ -111,9 +162,14 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
                                 <div className="font-medium text-slate-200">{item.name}</div>
                                 {item.address && <div className="text-sm text-slate-400">{item.address}</div>}
                             </div>
-                            <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8" onClick={() => handleDelete(item.id)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button variant="ghost" size="icon" className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 h-8 w-8" onClick={() => handleEdit(item)}>
+                                    <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8" onClick={() => handleDelete(item.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
                     {list.length === 0 && <p className="text-center text-sm text-slate-400 py-4">Nenhum local cadastrado.</p>}
@@ -127,10 +183,31 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
     const [fee, setFee] = useState('')
+    const [editingId, setEditingId] = useState<number | null>(null)
 
     async function handleSubmit() {
         if (!name) return
-        await addCourierAction(name, phone, Number(fee), userId)
+
+        if (editingId) {
+            await import('@/actions/couriers').then(mod => mod.updateCourier(editingId, name, phone, Number(fee)))
+            setEditingId(null)
+        } else {
+            await addCourierAction(name, phone, Number(fee), userId)
+        }
+        setName('')
+        setPhone('')
+        setFee('')
+    }
+
+    function handleEdit(item: any) {
+        setEditingId(item.id)
+        setName(item.name)
+        setPhone(item.phone || '')
+        setFee(item.default_fee ? String(item.default_fee) : '')
+    }
+
+    function handleCancel() {
+        setEditingId(null)
         setName('')
         setPhone('')
         setFee('')
@@ -177,8 +254,13 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
                             />
                         </div>
                         <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 shrink-0">
-                            Adicionar
+                            {editingId ? 'Atualizar' : 'Adicionar'}
                         </Button>
+                        {editingId && (
+                            <Button onClick={handleCancel} variant="outline" className="text-slate-300 border-slate-600 hover:bg-slate-800 shrink-0">
+                                Cancelar
+                            </Button>
+                        )}
                     </div>
                 </div>
                 <div className="space-y-3">
@@ -191,9 +273,14 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
                                     {item.default_fee > 0 && <span className="text-emerald-400 font-medium">• R$ {item.default_fee}</span>}
                                 </div>
                             </div>
-                            <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8" onClick={() => handleDelete(item.id)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button variant="ghost" size="icon" className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 h-8 w-8" onClick={() => handleEdit(item)}>
+                                    <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8" onClick={() => handleDelete(item.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
                     {list.length === 0 && <p className="text-center text-sm text-slate-400 py-4">Nenhum entregador cadastrado.</p>}

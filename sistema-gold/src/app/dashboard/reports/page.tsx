@@ -1,20 +1,21 @@
-import { getSession } from "@/actions/auth"
-import { getReports, getCustomers } from "@/actions/transactions"
-import { getPoints } from "@/actions/points"
-import { AnalyticsDashboard } from "@/components/dashboard/analytics-dashboard"
+import { getReports, getCustomers } from '@/actions/transactions'
+import { getPoints } from '@/actions/points'
+import { ReportsClient } from './reports-client'
 
 export const dynamic = 'force-dynamic'
 
-const defaultStart = new Date().toISOString().split('T')[0]
-const defaultEnd = new Date().toISOString().split('T')[0]
-
-export default async function DashboardPage(props: {
+export default async function ReportsPage(props: {
     searchParams: Promise<{ from?: string; to?: string; pointId?: string; customer?: string }>
 }) {
-    const session = await getSession()
-    if (!session) return null
-
     const searchParams = await props.searchParams
+
+    // Default to first day of current month to today
+    const now = new Date()
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+
+    // Format YYYY-MM-DD
+    const defaultStart = firstDay.toISOString().split('T')[0]
+    const defaultEnd = now.toISOString().split('T')[0]
 
     const from = searchParams.from || defaultStart
     const to = searchParams.to || defaultEnd
@@ -26,7 +27,7 @@ export default async function DashboardPage(props: {
     const customers = await getCustomers()
 
     return (
-        <AnalyticsDashboard
+        <ReportsClient
             transactions={data.transactions}
             summary={data.summary}
             dateRange={{ start: from, end: to }}
