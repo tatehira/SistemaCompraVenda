@@ -74,13 +74,13 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
     return (
         <div className="space-y-8">
             {/* Header & Filter */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
                 <div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard Financeiro</h1>
                     <p className="text-slate-400 mt-1">Visão geral do sistema</p>
                 </div>
 
-                <div className="flex items-end gap-3 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                <div className="flex flex-col sm:flex-row items-end gap-3 bg-slate-800 p-3 rounded-xl border border-slate-700 w-full md:w-auto overflow-x-auto">
                     <div>
                         <label className="text-xs text-slate-400 block mb-1 ml-1">Data Início</label>
                         <input
@@ -156,7 +156,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="border-emerald-500/20 shadow-lg shadow-black/20 bg-[#1e293b]/70 backdrop-blur-md hover:-translate-y-1 transition-all duration-300">
+                <Card className="border-emerald-500/20 shadow-lg shadow-black/20 bg-[#1e293b] hover:-translate-y-1 transition-all duration-300">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-semibold text-emerald-200">Total Vendas</CardTitle>
                         <ArrowUpCircle className="h-4 w-4 text-emerald-400" />
@@ -167,7 +167,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                     </CardContent>
                 </Card>
 
-                <Card className="border-blue-500/20 shadow-lg shadow-black/20 bg-[#1e293b]/70 backdrop-blur-md hover:-translate-y-1 transition-all duration-300">
+                <Card className="border-blue-500/20 shadow-lg shadow-black/20 bg-[#1e293b] hover:-translate-y-1 transition-all duration-300">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-semibold text-blue-200">Total Compras</CardTitle>
                         <ArrowDownCircle className="h-4 w-4 text-blue-400" />
@@ -179,7 +179,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                 </Card>
 
                 <Card className={clsx(
-                    "shadow-lg shadow-black/20 bg-[#1e293b]/70 backdrop-blur-md hover:-translate-y-1 transition-all duration-300",
+                    "shadow-lg shadow-black/20 bg-[#1e293b] hover:-translate-y-1 transition-all duration-300",
                     summary.balance >= 0
                         ? "border-indigo-500/20"
                         : "border-red-500/20"
@@ -198,7 +198,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                     </CardContent>
                 </Card>
 
-                <Card className="border-slate-700/50 shadow-lg shadow-black/20 bg-[#1e293b]/70 backdrop-blur-md hover:-translate-y-1 transition-all duration-300">
+                <Card className="border-slate-700/50 shadow-lg shadow-black/20 bg-[#1e293b] hover:-translate-y-1 transition-all duration-300">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-semibold text-slate-300">Volume Total</CardTitle>
                         <Scale className="h-4 w-4 text-slate-400" />
@@ -212,7 +212,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
 
             {/* Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-2 border-slate-700/50 shadow-lg shadow-black/20 bg-[#1e293b]/70 backdrop-blur-md hover:-translate-y-1 transition-all duration-300">
+                <Card className="lg:col-span-2 border-slate-700/50 shadow-lg shadow-black/20 bg-[#1e293b] hover:-translate-y-1 transition-all duration-300">
                     <CardHeader>
                         <CardTitle className="text-white">Fluxo de Caixa Diário</CardTitle>
                     </CardHeader>
@@ -247,7 +247,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                 </Card>
 
                 {/* Recent Transactions List (Mini) */}
-                <Card className="border-slate-700/50 shadow-lg shadow-black/20 bg-[#1e293b]/70 backdrop-blur-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                <Card className="border-slate-700/50 shadow-lg shadow-black/20 bg-[#1e293b] hover:-translate-y-1 transition-all duration-300 flex flex-col">
                     <CardHeader>
                         <CardTitle className="text-white">Últimas Transações</CardTitle>
                     </CardHeader>
@@ -264,7 +264,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium text-white">{t.gold_name} - {t.weight_grams}g</p>
-                                            <p className="text-xs text-slate-400">{new Date(t.date).toLocaleDateString()}</p>
+                                            <p className="text-xs text-slate-400">{new Date(t.date).toLocaleDateString('pt-BR')}</p>
                                         </div>
                                     </div>
                                     <div className="text-right">
@@ -283,10 +283,10 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
             {/* Full List Section (Optional, can be hidden or shown) */}
             <div>
                 <h2 className="text-xl font-bold text-white mb-4">Relatório Detalhado</h2>
-                <div className="border border-slate-700/50 rounded-xl overflow-hidden shadow-lg shadow-black/20 bg-[#1e293b]/70 backdrop-blur-md hover:-translate-y-1 transition-all duration-300">
+                <div className="border border-slate-700/50 rounded-xl overflow-hidden shadow-lg shadow-black/20 bg-[#1e293b] hover:-translate-y-1 transition-all duration-300">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-white uppercase bg-slate-900/80 border-b border-slate-700 font-bold tracking-wider">
+                            <thead className="text-xs text-white uppercase bg-slate-900 border-b border-slate-700 font-bold tracking-wider">
                                 <tr>
                                     <th className="px-6 py-4">Data</th>
                                     <th className="px-6 py-4">Cliente</th>
@@ -300,7 +300,7 @@ export function AnalyticsDashboard({ transactions, summary, dateRange, points, i
                                 {currentTransactions.map((t) => (
                                     <tr key={t.id} className="border-b border-slate-700/50 last:border-0 hover:bg-white/5 transition-colors">
                                         <td className="px-6 py-4 font-medium text-slate-300">
-                                            {new Date(t.date).toLocaleDateString()}
+                                            {new Date(t.date).toLocaleDateString('pt-BR')}
                                         </td>
                                         <td className="px-6 py-4 text-slate-300">
                                             {t.customer_name || '-'}
