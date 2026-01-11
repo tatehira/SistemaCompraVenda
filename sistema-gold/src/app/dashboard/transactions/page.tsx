@@ -9,7 +9,7 @@ export default async function TransactionsPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Histórico de Transações</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Histórico de Transações</h1>
 
             {/* Render Client Component with Key-based Tabs */}
             <TransactionsList transactions={transactions} />
