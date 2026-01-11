@@ -21,7 +21,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex h-screen items-center justify-center bg-zinc-100">
+        <div className="flex h-screen items-center justify-center">
             <Card className="w-[350px]">
                 <CardHeader>
                     <CardTitle>{isRegister ? 'Criar Conta' : 'Entrar'}</CardTitle>

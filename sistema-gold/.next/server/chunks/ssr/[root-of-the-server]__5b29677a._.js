@@ -17,6 +17,13 @@ module.exports=[24868,(a,b,c)=>{b.exports=a.x("fs/promises",()=>require("fs/prom
         LEFT JOIN points p ON t.point_id = p.id
         WHERE t.user_id = ?
         ORDER BY date DESC
-    `).all(b)}(0,a.i(13095).ensureServerEntryExports)([i,j,k,l]),(0,b.registerServerReference)(i,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",null),(0,b.registerServerReference)(j,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",null),(0,b.registerServerReference)(k,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",null),(0,b.registerServerReference)(l,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",null),a.s(["buy",()=>i,"getInventory",()=>k,"getTransactions",()=>l,"sell",()=>j])},74622,a=>{"use strict";var b=a.i(63707),c=a.i(32705);a.s([],93301),a.i(93301),a.s(["001cff6da69649cb3538ebb44b85726acfda477617",()=>b.getSession,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",()=>c.getInventory,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",()=>c.getTransactions,"00f5ae00e140bafd8c394ea98ad441ac36c1f2b778",()=>b.logout,"400005926efb722f25cb6dbbee9d650d9ce8a30e42",()=>b.register,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",()=>c.buy,"40b73d41e742e5c9864de0c62d5bd2bf172ed6c6d1",()=>b.login,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",()=>c.sell],74622)}];
+    `).all(b)}async function m(){let a=await (0,g.getSession)();if(!a)return[];let b=Number(a.sub);return c.default.prepare(`
+        SELECT strftime('%Y-%m-%d', date) as date, SUM(price) as total
+        FROM transactions
+        WHERE type = 'SELL' AND user_id = ?
+        GROUP BY date
+        ORDER BY date ASC
+        LIMIT 30
+    `).all(b)}(0,a.i(13095).ensureServerEntryExports)([i,j,k,l,m]),(0,b.registerServerReference)(i,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",null),(0,b.registerServerReference)(j,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",null),(0,b.registerServerReference)(k,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",null),(0,b.registerServerReference)(l,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",null),(0,b.registerServerReference)(m,"00f8b6b51ec039725d13a2c470924b629bd2c60752",null),a.s(["buy",()=>i,"getDailySales",()=>m,"getInventory",()=>k,"getTransactions",()=>l,"sell",()=>j])},74622,a=>{"use strict";var b=a.i(63707),c=a.i(32705);a.s([],93301),a.i(93301),a.s(["001cff6da69649cb3538ebb44b85726acfda477617",()=>b.getSession,"003324c74d0aa8c732b6ab05246d9f2eb2e7db5f56",()=>c.getInventory,"00b1aa0a5aabcd51d7e4770e006ea38d2077a06119",()=>c.getTransactions,"00f5ae00e140bafd8c394ea98ad441ac36c1f2b778",()=>b.logout,"00f8b6b51ec039725d13a2c470924b629bd2c60752",()=>c.getDailySales,"400005926efb722f25cb6dbbee9d650d9ce8a30e42",()=>b.register,"40a6bd7a98cbdb2610d87168772495a140cc23b2bb",()=>c.buy,"40b73d41e742e5c9864de0c62d5bd2bf172ed6c6d1",()=>b.login,"40f2e801184a8ed1f430e97bac6910394b6cc2bfc2",()=>c.sell],74622)}];
 
 //# sourceMappingURL=%5Broot-of-the-server%5D__5b29677a._.js.map

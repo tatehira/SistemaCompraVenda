@@ -23,7 +23,7 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
     }
 
     return (
-        <Card className="border-amber-200/50 bg-white">
+        <Card className="border-indigo-100 bg-white shadow-sm">
             <CardHeader>
                 <CardTitle>Tipos de Ouro</CardTitle>
                 <CardDescription>Cadastre os tipos de ouro (ex: 18k, 24k).</CardDescription>
@@ -31,7 +31,7 @@ export function GoldTypeForm({ list, userId }: { list: any[], userId: number }) 
             <CardContent>
                 <div className="flex gap-2 mb-4">
                     <Input placeholder="Nome (ex: Gold 18k)" value={name} onChange={e => setName(e.target.value)} />
-                    <Button onClick={handleSubmit} className="bg-amber-600 hover:bg-amber-700 text-white">Adicionar</Button>
+                    <Button onClick={handleSubmit} className="bg-stripe-gradient hover:opacity-90 text-white transition-opacity">Adicionar</Button>
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
@@ -63,7 +63,7 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
     }
 
     return (
-        <Card className="border-amber-200/50 bg-white">
+        <Card className="border-indigo-100 bg-white shadow-sm">
             <CardHeader>
                 <CardTitle>Locais / Filiais</CardTitle>
                 <CardDescription>Gerencie seus pontos de venda.</CardDescription>
@@ -72,7 +72,7 @@ export function PointsForm({ list, userId }: { list: any[], userId: number }) {
                 <div className="flex flex-col gap-2 mb-4">
                     <Input placeholder="Nome (ex: Loja Centro)" value={name} onChange={e => setName(e.target.value)} />
                     <Input placeholder="Endereço" value={address} onChange={e => setAddress(e.target.value)} />
-                    <Button onClick={handleSubmit} className="bg-amber-600 hover:bg-amber-700 text-white">Adicionar</Button>
+                    <Button onClick={handleSubmit} className="bg-stripe-gradient hover:opacity-90 text-white transition-opacity">Adicionar</Button>
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (
@@ -109,7 +109,7 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
     }
 
     return (
-        <Card className="border-amber-200/50 bg-white">
+        <Card className="border-indigo-100 bg-white shadow-sm">
             <CardHeader>
                 <CardTitle>Motoboys / Entregadores</CardTitle>
                 <CardDescription>Cadastre seus entregadores.</CardDescription>
@@ -119,7 +119,7 @@ export function CouriersForm({ list, userId }: { list: any[], userId: number }) 
                     <Input placeholder="Nome" value={name} onChange={e => setName(e.target.value)} />
                     <Input placeholder="Telefone" value={phone} onChange={e => setPhone(e.target.value)} />
                     <Input placeholder="Taxa Padrão (R$)" type="number" value={fee} onChange={e => setFee(e.target.value)} />
-                    <Button onClick={handleSubmit} className="bg-amber-600 hover:bg-amber-700 text-white">Adicionar</Button>
+                    <Button onClick={handleSubmit} className="bg-stripe-gradient hover:opacity-90 text-white transition-opacity">Adicionar</Button>
                 </div>
                 <div className="space-y-2">
                     {list.map((item: any) => (

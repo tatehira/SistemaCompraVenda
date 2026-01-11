@@ -99,7 +99,7 @@ export function TransactionsList({ transactions }: { transactions: Transaction[]
                                                 <Link
                                                     href={t.receipt_path}
                                                     target="_blank"
-                                                    className="text-amber-600 hover:text-amber-700 font-medium hover:underline"
+                                                    className="text-indigo-600 hover:text-indigo-700 font-medium hover:underline"
                                                 >
                                                     Ver Comprovante
                                                 </Link>

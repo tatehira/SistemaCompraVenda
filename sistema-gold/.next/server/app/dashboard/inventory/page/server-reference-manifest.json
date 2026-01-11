@@ -90,6 +90,21 @@
       "exportedName": "getTransactions",
       "filename": "src/actions/transactions.ts"
     },
+    "00f8b6b51ec039725d13a2c470924b629bd2c60752": {
+      "workers": {
+        "app/dashboard/inventory/page": {
+          "moduleId": 74622,
+          "async": false,
+          "exportedName": "getDailySales",
+          "filename": "src/actions/transactions.ts"
+        }
+      },
+      "layer": {
+        "app/dashboard/inventory/page": "rsc"
+      },
+      "exportedName": "getDailySales",
+      "filename": "src/actions/transactions.ts"
+    },
     "40a6bd7a98cbdb2610d87168772495a140cc23b2bb": {
       "workers": {
         "app/dashboard/inventory/page": {

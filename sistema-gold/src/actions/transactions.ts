@@ -170,3 +170,20 @@ export async function getTransactions() {
         ORDER BY date DESC
     `).all(userId)
 }
+
+export async function getDailySales() {
+    const session = await getSession()
+    if (!session) return []
+    const userId = Number(session.sub)
+
+    // SQLite: strftime('%Y-%m-%d', date) extracts the date part
+    // We get last 30 days of sales
+    return db.prepare(`
+        SELECT strftime('%Y-%m-%d', date) as date, SUM(price) as total
+        FROM transactions
+        WHERE type = 'SELL' AND user_id = ?
+        GROUP BY date
+        ORDER BY date ASC
+        LIMIT 30
+    `).all(userId)
+}
