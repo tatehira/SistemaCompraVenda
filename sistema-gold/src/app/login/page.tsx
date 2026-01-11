@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useState } from 'react'
 import { Lock, User } from 'lucide-react'
+import Image from 'next/image'
 
 export default function LoginPage() {
     const [isRegister, setIsRegister] = useState(false)
@@ -31,8 +32,15 @@ export default function LoginPage() {
 
             <Card className="w-[380px] z-10 border-indigo-500/20 bg-white/5 backdrop-blur-xl shadow-2xl shadow-black/40">
                 <CardHeader className="text-center pb-2">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 shadow-lg shadow-indigo-500/30">
-                        <Lock className="h-6 w-6 text-white" />
+                    <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center relative">
+                        <div className="absolute inset-0 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+                        <Image
+                            src="/logo.png"
+                            alt="Gold System Logo"
+                            width={96}
+                            height={96}
+                            className="object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                        />
                     </div>
                     <CardTitle className="text-2xl font-bold text-white tracking-tight">
                         <span className="text-white">GOLD</span><span className="text-indigo-400">SYSTEM</span>

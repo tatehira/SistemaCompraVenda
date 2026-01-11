@@ -34,10 +34,10 @@ export function SidebarNav() {
                             "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
                             isActive
                                 ? "bg-white/20 text-white font-semibold shadow-inner"
-                                : "text-indigo-200 hover:text-white hover:bg-white/10"
+                                : "text-slate-200 hover:text-white hover:bg-white/10"
                         )}
                     >
-                        <item.icon className={clsx("h-4 w-4", isActive ? "text-indigo-100" : "text-indigo-300")} />
+                        <item.icon className={clsx("h-4 w-4", isActive ? "text-indigo-100" : "text-slate-300")} />
                         {item.label}
                     </Link>
                 )

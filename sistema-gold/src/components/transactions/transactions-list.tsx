@@ -29,17 +29,17 @@ export function TransactionsList({ transactions }: { transactions: Transaction[]
     return (
         <div className="space-y-6">
             {/* Tabs */}
-            <div className="flex p-1 space-x-1 bg-zinc-100/80 rounded-xl w-fit border border-zinc-200">
+            <div className="flex p-1 space-x-1 bg-slate-800/50 rounded-xl w-fit border border-slate-700">
                 <button
                     onClick={() => setActiveTab('in')}
                     className={clsx(
                         "flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300",
                         activeTab === 'in'
-                            ? "bg-white text-zinc-950 shadow-sm ring-1 ring-zinc-200"
-                            : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-200/50"
+                            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 ring-1 ring-indigo-500"
+                            : "text-slate-300 hover:text-white hover:bg-white/5"
                     )}
                 >
-                    <ArrowDownCircle className={clsx("w-4 h-4", activeTab === 'in' ? "text-blue-600" : "text-zinc-400")} />
+                    <ArrowDownCircle className={clsx("w-4 h-4", activeTab === 'in' ? "text-indigo-200" : "text-slate-400")} />
                     Entradas (Compras)
                 </button>
                 <button
@@ -47,21 +47,21 @@ export function TransactionsList({ transactions }: { transactions: Transaction[]
                     className={clsx(
                         "flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300",
                         activeTab === 'out'
-                            ? "bg-white text-zinc-950 shadow-sm ring-1 ring-zinc-200"
-                            : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-200/50"
+                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 ring-1 ring-emerald-500"
+                            : "text-slate-300 hover:text-white hover:bg-white/5"
                     )}
                 >
-                    <ArrowUpCircle className={clsx("w-4 h-4", activeTab === 'out' ? "text-green-600" : "text-zinc-400")} />
+                    <ArrowUpCircle className={clsx("w-4 h-4", activeTab === 'out' ? "text-emerald-200" : "text-slate-400")} />
                     Saídas (Vendas)
                 </button>
             </div>
 
             {/* Table */}
-            <Card className="border-zinc-200 shadow-sm overflow-hidden">
+            <Card className="border-slate-800 shadow-xl bg-[#1e293b]/70 backdrop-blur-md overflow-hidden">
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-zinc-600 uppercase bg-zinc-50 border-b border-zinc-200 font-semibold tracking-wider">
+                            <thead className="text-xs text-white uppercase bg-slate-900/80 border-b border-slate-700 font-bold tracking-wider">
                                 <tr>
                                     <th className="px-6 py-4">Data</th>
                                     <th className="px-6 py-4">Tipo</th>
@@ -75,31 +75,31 @@ export function TransactionsList({ transactions }: { transactions: Transaction[]
                             </thead>
                             <tbody>
                                 {filteredTransactions.map((t) => (
-                                    <tr key={t.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50/80 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap text-zinc-600 font-medium">
+                                    <tr key={t.id} className="border-b border-slate-700/50 last:border-0 hover:bg-white/5 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-slate-200 font-medium">
                                             {new Date(t.date).toLocaleDateString()}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={clsx(
                                                 "px-2.5 py-1 rounded-full text-xs font-bold border",
                                                 t.type === 'BUY'
-                                                    ? "bg-blue-50 text-blue-700 border-blue-200"
-                                                    : "bg-green-50 text-green-700 border-green-200"
+                                                    ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                                                    : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
                                             )}>
                                                 {t.type === 'BUY' ? 'COMPRA' : 'VENDA'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-zinc-700">{t.gold_name}</td>
-                                        <td className="px-6 py-4 font-semibold text-zinc-900">{t.weight_grams} {t.unit}</td>
-                                        <td className="px-6 py-4 text-zinc-700">R$ {t.price.toFixed(2)}</td>
-                                        <td className="px-6 py-4 text-zinc-600">{t.point_name}</td>
-                                        <td className="px-6 py-4 text-zinc-600">{t.customer_name || '-'}</td>
+                                        <td className="px-6 py-4 text-slate-200">{t.gold_name}</td>
+                                        <td className="px-6 py-4 font-bold text-white">{t.weight_grams} {t.unit}</td>
+                                        <td className="px-6 py-4 text-white font-medium">R$ {t.price.toFixed(2)}</td>
+                                        <td className="px-6 py-4 text-slate-300">{t.point_name}</td>
+                                        <td className="px-6 py-4 text-slate-300">{t.customer_name || '-'}</td>
                                         <td className="px-6 py-4 text-right">
                                             {t.receipt_path && (
                                                 <Link
                                                     href={t.receipt_path}
                                                     target="_blank"
-                                                    className="text-indigo-600 hover:text-indigo-700 font-medium hover:underline"
+                                                    className="text-indigo-300 hover:text-indigo-200 font-medium hover:underline"
                                                 >
                                                     Ver Comprovante
                                                 </Link>
@@ -109,7 +109,7 @@ export function TransactionsList({ transactions }: { transactions: Transaction[]
                                 ))}
                                 {filteredTransactions.length === 0 && (
                                     <tr>
-                                        <td colSpan={8} className="px-6 py-12 text-center text-zinc-400">
+                                        <td colSpan={8} className="px-6 py-12 text-center text-slate-300 font-medium">
                                             Nenhuma transação de {activeTab === 'in' ? 'entrada' : 'saída'} encontrada.
                                         </td>
                                     </tr>
